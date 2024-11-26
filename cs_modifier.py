@@ -134,7 +134,7 @@ def main(config_file,ptype, scale_factor_p, scale_factor_k, threshold,increase):
     flux = runmceq(mceq_tune,ptype,doy,angles)
 
     # save file
-    np.save(flux_dir + ptype + '_' + str(scale_factor_p) + 'pion_' + str(scale_factor_k) + 'kaon_' +  str(threshold) + '_' + incrase + '_mceqflux.npy',flux) 
+    np.save(flux_dir + ptype + '_' + str(scale_factor_p) + 'pion_' + str(scale_factor_k) + 'kaon_' +  str(threshold) + '_' + increase + '_mceqflux.npy',flux) 
 
 
 
