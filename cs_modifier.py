@@ -91,7 +91,7 @@ def main(config_file,ptype, scale_factor_p, scale_factor_k, threshold,increase):
     scale_factor_p = np.float(f'{scale_factor_p}')
     scale_factor_k = np.float(f'{scale_factor_k}')
     threshold = np.float(f'{threshold}')
-    incrase = f'{increase}'
+    increase = f'{increase}'
 
     scale_factor = [scale_factor_p,scale_factor_k]
 
