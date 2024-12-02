@@ -92,7 +92,7 @@ class SensitivityAnalyzer:
 
         plt.figure(figsize=(12, 6))
         for i in range(len(ebins) - 4):
-            plt.plot(self.doys, sensitivity[j][i], marker='.', linestyle='-', label=f"{np.round(np.log10(ebins[i]), decimals=1)} $\leq$ log(E/GeV) $\leq$ {np.round(np.log10(ebins[i + 1]), decimals=1)}")
+            plt.plot(self.doys, sensitivity[0][i], marker='.', linestyle='-', label=f"{np.round(np.log10(ebins[i]), decimals=1)} $\leq$ log(E/GeV) $\leq$ {np.round(np.log10(ebins[i + 1]), decimals=1)}")
         plt.axhline(y=1, color='black', linestyle='--', label='Original Value')
         plt.title('Daily Sensitivity Across the Year')
         plt.ylabel('Daily deviation from seasonal variation amplitude')
