@@ -16,6 +16,7 @@ class ModIntCrossSections(InteractionCrossSections):
         self.scale_factor = scale_factor  # Default scaling factor
         self.threshold = threshold
         self.increase = increase
+        self.interaction_model = interaction_model
         super().__init__(mceq_hdf_db, interaction_model)  # Call parent constructor
 
     def modify_cs(self, scale_factor=None,threshold =None, increase = None):
@@ -83,8 +84,9 @@ def runmceq(mceq_object,ptype,doys,angles): #create
 @click.option('--scale_factor_p','-f', help='list with cs modification pion, 1 = untuned for const, 0 = untuned for exp')
 @click.option('--threshold','-t', help='threshold above which modification is applied', default='1.e4')
 @click.option('--increase','-i', help='const or exp', default='const')
+@click.option('--interactionmodel','-m', help='hadr. interaction model', default="SIBYLL2.3c")
 
-def main(config_file,ptype, scale_factor_p, scale_factor_k, threshold,increase):
+def main(config_file,ptype, scale_factor_p, scale_factor_k, threshold,increase,interactionmodel):
 
     # get arguments 
     ptype = f'{ptype}'
@@ -102,29 +104,29 @@ def main(config_file,ptype, scale_factor_p, scale_factor_k, threshold,increase):
 
     #initialize mceq instances
     mceq_tune = MCEqRun(
-        interaction_model="SIBYLL2.3c",
+        interaction_model=interactionmodel,
         theta_deg=0.0,
         primary_model=(pm.HillasGaisser2012, "H3a"),
         density_model = (('MSIS00_IC',('SouthPole','January')))
     )
 
     mceq= MCEqRun(
-        interaction_model="SIBYLL2.3c",
+        interaction_model=interactionmodel,
         theta_deg=0.0,
         primary_model=(pm.HillasGaisser2012, "H3a"),
         density_model = (('MSIS00_IC',('SouthPole','January')))
     )
 
     # modify cross section
-    modcs = ModIntCrossSections(mceq._mceq_db, interaction_model="SIBYLL2.3c", scale_factor=scale_factor,threshold=threshold,increase=increase) #scale_factor=[1.,1.3],threshold=1.e4,increase='const')
-    modcs.load(interaction_model="SIBYLL2.3c")
+    modcs = ModIntCrossSections(mceq._mceq_db, interaction_model=interactionmodel, scale_factor=scale_factor,threshold=threshold,increase=increase) #scale_factor=[1.,1.3],threshold=1.e4,increase='const')
+    modcs.load(interaction_model=interactionmodel)
 
     mceq_tune._int_cs = modcs # add modification to cross section in mceq instance
-    mceq_tune.set_interaction_model("SIBYLL2.3c", force=True) # necessary to force cross section change
+    mceq_tune.set_interaction_model(interactionmodel, force=True) # necessary to force cross section change
 
     #test if tuning is correct:
-    print('ratio pion cross section tuned/untuned: ', modcs.get_cs(211, mbarn=True)/InteractionCrossSections(mceq._mceq_db, interaction_model="SIBYLL2.3c").get_cs(211, mbarn=True))
-    print('ratio pion cross section tuned/untuned: ', modcs.get_cs(321, mbarn=True)/InteractionCrossSections(mceq._mceq_db, interaction_model="SIBYLL2.3c").get_cs(321, mbarn=True))
+    print('ratio pion cross section tuned/untuned: ', modcs.get_cs(211, mbarn=True)/InteractionCrossSections(mceq._mceq_db, interaction_model=interactionmodel).get_cs(211, mbarn=True))
+    print('ratio kaon cross section tuned/untuned: ', modcs.get_cs(321, mbarn=True)/InteractionCrossSections(mceq._mceq_db, interaction_model=interactionmodel).get_cs(321, mbarn=True))
 
     # define angles and days for flux calculation
     angles = angular_bins(ptype, 2)
@@ -134,7 +136,7 @@ def main(config_file,ptype, scale_factor_p, scale_factor_k, threshold,increase):
     flux = runmceq(mceq_tune,ptype,doy,angles)
 
     # save file
-    np.save(flux_dir + ptype + '_' + str(scale_factor_p) + 'pion_' + str(scale_factor_k) + 'kaon_' +  str(threshold) + '_' + increase + '_mceqflux.npy',flux) 
+    np.save(flux_dir + ptype + '_' + str(scale_factor_p) + 'pion_' + str(scale_factor_k) + 'kaon_' +  str(threshold) + '_' + increase + '_'+ interactionmodel+'_mceqflux.npy',flux) 
 
 
 

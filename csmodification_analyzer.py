@@ -10,7 +10,7 @@ import scipy.optimize as opt
 from utils.helpers import *
 
 class SensitivityAnalyzer:
-    def __init__(self, ptype, scale_factor_p, scale_factor_k, doys, threshold, increase):
+    def __init__(self, ptype, scale_factor_p, scale_factor_k, doys, threshold, increase, interactionmodel = None):
         """
         Initialize the SensitivityAnalyzer with the parameters. This class analyzes the variation of cross sections regarding the seasonal flux variation.
 
@@ -20,15 +20,18 @@ class SensitivityAnalyzer:
         - cs_k (float): Kaon-air cs factor (increase or decrease)
         - doys (list): List of days of the year for analysis.
         - const (string): threshold above whic cross section is changed.
+        - interactionmodel (string): must be available in MCEq - default is Sibyll2.3c (None)
+
         """
         self.ptype = ptype
         self.scale_factor_p = scale_factor_p
         self.scale_factor_k = scale_factor_k
         self.threshold = threshold
         self.increase = increase
+        self.interactionmodel = interactionmodel
        
         self.doys = doys
-        self.cs_mod =  self.ptype + '_' + str(self.scale_factor_p) + 'pion_' + str(self.scale_factor_k) + 'kaon_' +  str(self.threshold) + '_' + self.increase
+        self.cs_mod =  self.ptype + '_' + str(self.scale_factor_p) + 'pion_' + str(self.scale_factor_k) + 'kaon_' +  str(self.threshold) + '_' + self.increase + '_' + self.interactionmodel
                
     def ebins_gev(self):
         #create 1 bin but keep list format for compatibility with the other functions - for analysis of GeV muons
@@ -37,8 +40,7 @@ class SensitivityAnalyzer:
     
     def ebins_rate(self):
         #create 1 bin but keep list format for compatibility with the other functions - rate for detections in icecube
-        ebins = np.logspace(2, 6
-                            , num=2)
+        ebins = np.logspace(2, 6, num=2)
         return ebins
     
     
@@ -60,11 +62,11 @@ class SensitivityAnalyzer:
 
     def load_data(self): # change
 
-        self.flux_tuned = np.load(f'/data/user/khymon/cs-analysis/{self.ptype}_{self.scale_factor_p}pion_{self.scale_factor_k}kaon_{self.threshold}_{self.increase}_mceqflux.npy')
+        self.flux_tuned = np.load(f'/data/user/khymon/cs-analysis/{self.ptype}_{self.scale_factor_p}pion_{self.scale_factor_k}kaon_{self.threshold}_{self.increase}_{self.interactionmodel}_mceqflux.npy')
         if self.increase == 'const':
-            self.flux_untuned = np.load(f'/data/user/khymon/cs-analysis/{self.ptype}_1.0pion_1.0kaon_{self.threshold}_{self.increase}_mceqflux.npy')   
+            self.flux_untuned = np.load(f'/data/user/khymon/cs-analysis/{self.ptype}_1.0pion_1.0kaon_{self.threshold}_{self.increase}_{self.interactionmodel}_mceqflux.npy')   
         elif self.increase == 'exp':
-            self.flux_untuned = np.load(f'/data/user/khymon/cs-analysis/{self.ptype}_0.0pion_0.0kaon_{self.threshold}_{self.increase}_mceqflux.npy')
+            self.flux_untuned = np.load(f'/data/user/khymon/cs-analysis/{self.ptype}_0.0pion_0.0kaon_{self.threshold}_{self.increase}_{self.interactionmodel}_mceqflux.npy')
          
 
     def get_sv_amplitude(self, flux, energy, ebins, angles_edges, doys):
@@ -139,7 +141,7 @@ class SensitivityAnalyzer:
             plt.legend(ncol=2)
             plt.grid(True)
             plt.text(50,0.99,f'{self.ptype} {self.scale_factor_k}xkaon {self.scale_factor_p}pion threshold{self.threshold}GeV')
-            plt.savefig(f'/home/khymon/Plots/cs-analysis/sv_amplitude_mcs_' + tag[e] +'_dailysensitivity{self.cs_mod}_zenith{np.round(angles_edges[0], decimals=0)}-{np.round(angles_edges[1], decimals=0)}.png', bbox_inches='tight')
+            plt.savefig(f'/home/khymon/Plots/cs-analysis/sv_amplitude_mcs_{tag[e]}_dailysensitivity{self.cs_mod}_zenith{np.round(angles_edges[0], decimals=0)}-{np.round(angles_edges[1], decimals=0)}.png', bbox_inches='tight')
 
     def sv_amplitude_plot(self):
         angles_edges  = angular_bins(self.ptype, 2)
