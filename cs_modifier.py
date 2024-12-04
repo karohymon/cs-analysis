@@ -129,7 +129,9 @@ def main(config_file,ptype, scale_factor_p, scale_factor_k, threshold,increase,i
     print('ratio kaon cross section tuned/untuned: ', modcs.get_cs(321, mbarn=True)/InteractionCrossSections(mceq._mceq_db, interaction_model=interactionmodel).get_cs(321, mbarn=True))
 
     # define angles and days for flux calculation
-    angles = angular_bins(ptype, 2)
+    angle_edges = angular_bins(ptype, 2)
+    angles = (angle_edges[:-1] + angle_edges[1:]) / 2
+
     doy = doys(5) # take every 5th day for fast testing purposes
 
     # calculate flux
