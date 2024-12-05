@@ -25,3 +25,6 @@ def ebins():
     bin_edges = np.logspace(2.1, 6, num=int((6 - 2.1) / step) + 1)
 
     return bin_edges
+
+def bin_center(bin_edges):
+    return (bin_edges[:-1] + bin_edges[1:]) / 2

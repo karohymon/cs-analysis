@@ -53,7 +53,7 @@ def main(config_file):
     type_weight = df['I3MCWeightDict.TypeWeight'].values  
     nevents = df['I3MCWeightDict.NEvents'].values * nfiles * type_weight
 
-    costh_bins =np.arccos(np.linspace(np.cos(np.deg2rad(theta_max)),np.cos(np.deg2rad(theta_min)),6))[::-1]
+    costh_bins =np.arccos(np.linspace(np.cos(np.deg2rad(theta_max)),np.cos(np.deg2rad(theta_min)),2))[::-1]
 
     step = 0.3
     bin_edges = np.logspace(2.1, 6, num=int((6 - 2.1) / step) + 1)
