@@ -122,7 +122,7 @@ def production_profile(conf_folders,interactionmodel,cs_k,cs_p,season, mceq_run)
     threshold = 1.e4
     increase = 'const'
 
-    max_zenith = np.cos(np.deg2rad(110.))
+    max_zenith = np.cos(np.deg2rad(100.))
     min_zenith = np.cos(np.deg2rad(90.))
     angles_edges = np.arccos(np.linspace(min_zenith,max_zenith,6))*180./np.pi # edges theta
     angles = np.zeros(5)

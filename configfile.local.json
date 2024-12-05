@@ -1,6 +1,7 @@
   {
     "plot_directory": "/home/khymon/Plots/cs-analysis/",
-    "fluxes": "/data/user/khymon/cs-analysis/"
+    "fluxes": "/data/user/khymon/cs-analysis/",
+    "Pass2MC" : "/data/user/khymon/Pass2MC/"
 
    
 }
