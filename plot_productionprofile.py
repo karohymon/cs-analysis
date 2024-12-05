@@ -230,11 +230,3 @@ def plot_profiles(conf_folders,interactionmodel1,cs_k1,cs_p1,season1,interaction
     
     
 
-    
-
-#conf_folders = config_handler.get_json_config(str(config_file))
-
-  
-
-#plot_production_profile(conf_folders,interactionmodel1,cs_k1,cs_p1,season1,interactionmodel2,cs_k2,cs_p2,season2,mceq_run))
-
