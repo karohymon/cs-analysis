@@ -62,12 +62,11 @@ def avgflux_at_bin_mid(mceq_spectrum, analysis_bin_edges,mceq_edges,Aeff):
     
     
     '''
-    flux_analysis_center =  np.ndarray(shape=(5,len(analysis_bin_edges)-1),dtype=float)    
+    flux_analysis_center =  np.ndarray(shape=(1,len(analysis_bin_edges)-1),dtype=float)    
     
-    for i in range(5):
+    for i in range(1):
         flux_analysis_center[i] = MCEq_bin_averages(mceq_spectrum[i], analysis_bin_edges,mceq_edges)
     
-    return (flux_analysis_center[0] * Aeff[:,0] + flux_analysis_center[1] * Aeff[:,1] + flux_analysis_center[2] * Aeff[:,2] + \
-                flux_analysis_center[3] * Aeff[:,3] + flux_analysis_center[4] * Aeff[:,4])/np.sum(Aeff,axis=1)
+    return (flux_analysis_center[0] * Aeff[:,0])/np.sum(Aeff,axis=1)
     
 

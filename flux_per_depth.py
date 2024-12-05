@@ -14,8 +14,8 @@ def save_mceq_sameheight(conf_folders,season,particle, mceq_run):
     # set zenith angle
     max_zenith = np.cos(np.deg2rad(100.))
     min_zenith = np.cos(np.deg2rad(90.))
-    angles_edges = np.arccos(np.linspace(min_zenith,max_zenith,6))*180./np.pi # edges theta
-    angles = np.zeros(5)
+    angles_edges = np.arccos(np.linspace(min_zenith,max_zenith,2))*180./np.pi # edges theta
+    angles = np.zeros(1)
     for i in range(len(angles)):
         angles[i] = np.mean([angles_edges[i],angles_edges[i+1]])
         # calculate bin midth for theta
@@ -23,7 +23,7 @@ def save_mceq_sameheight(conf_folders,season,particle, mceq_run):
     
     #density model 
     mceq_run.set_density_model(('MSIS00_IC',('SouthPole', "July"))) # 
-    mceq_run.set_theta_deg(angles[4])
+    mceq_run.set_theta_deg(angles[0])
     
     n_pts = 100
     X_grid = np.linspace(0.1, mceq_run.density_model.max_X, n_pts) # grid for spefic direction
@@ -56,7 +56,7 @@ def save_mceq_sameheight(conf_folders,season,particle, mceq_run):
                 
            
             
-    np.save( conf_folders['fluxes'] + particle + "_msis_sameheight_lowergrid_" + season+ ".npy",nu_msis)
+    np.save( conf_folders['prod_profiles'] + particle + "_msis_sameheight_lowergrid_" + season+ ".npy",nu_msis)
 
 
 @click.command()

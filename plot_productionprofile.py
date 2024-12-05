@@ -32,9 +32,9 @@ def avg_flux_at_bin_mid(mceq_spectrum, analysis_bin_edges,mceq_edges):
         Flux at analysis bin center.
     
     '''
-    flux_analysis_center =  np.ndarray(shape=(5,len(analysis_bin_edges)-1),dtype=float)    
+    flux_analysis_center =  np.ndarray(shape=(1,len(analysis_bin_edges)-1),dtype=float)    
     
-    for i in range(5):
+    for i in range(1):
         flux_analysis_center[i] = MCEq_bin_averages(mceq_spectrum[i], analysis_bin_edges,mceq_edges)
     
     return flux_analysis_center
@@ -72,8 +72,8 @@ def profile_energyrange(conf_folders,nu_msis,ebin_index):
     # set zenith angle
     max_zenith = np.cos(np.deg2rad(100.))
     min_zenith = np.cos(np.deg2rad(90.))
-    angles_edges = np.arccos(np.linspace(min_zenith,max_zenith,6))*180./np.pi # edges theta
-    angles = np.zeros(5)
+    angles_edges = np.arccos(np.linspace(min_zenith,max_zenith,2))*180./np.pi # edges theta
+    angles = np.zeros(1)
     for i in range(len(angles)):
         angles[i] = np.mean([angles_edges[i],angles_edges[i+1]])
         # calculate bin midth for theta
@@ -83,13 +83,13 @@ def profile_energyrange(conf_folders,nu_msis,ebin_index):
     step = 0.3
     bin_edges = np.logspace(2.1, 6, num=int((6 - 2.1) / step) + 1)
     
-    R_per_X_per_zenith = np.ndarray(dtype=float,shape=(5,100)) # for given season
+    R_per_X_per_zenith = np.ndarray(dtype=float,shape=(1,100)) # for given season
 
     dEgrid = bin_edges[ebin_index+1] - bin_edges[ebin_index]
     
    
     #dEgrid =energy_bin[1:] -energy_bin[:-1]
-    geom_factor =  - np.diff(np.linspace(0,max_zenith,6)) * 2 * np.pi #dCos int(dPhi # adapt for 90-110 zenith bins
+    geom_factor =  - np.diff(np.linspace(0,max_zenith,2)) * 2 * np.pi #dCos int(dPhi # adapt for 90-110 zenith bins
 
     for a in range(len(angles)):
         Aeff_center = Aeff_2D# effective area per analysis energy bin and zenith band 
@@ -124,8 +124,8 @@ def production_profile(conf_folders,interactionmodel,cs_k,cs_p,season, mceq_run)
 
     max_zenith = np.cos(np.deg2rad(100.))
     min_zenith = np.cos(np.deg2rad(90.))
-    angles_edges = np.arccos(np.linspace(min_zenith,max_zenith,6))*180./np.pi # edges theta
-    angles = np.zeros(5)
+    angles_edges = np.arccos(np.linspace(min_zenith,max_zenith,2))*180./np.pi # edges theta
+    angles = np.zeros(1)
     for i in range(len(angles)):
         angles[i] = np.mean([angles_edges[i],angles_edges[i+1]])
         # calculate bin midth for theta
@@ -135,7 +135,7 @@ def production_profile(conf_folders,interactionmodel,cs_k,cs_p,season, mceq_run)
     bin_edges = np.logspace(2.1, 6, num=int((6 - 2.1) / step) + 1)
 
     mceq_run.set_density_model(('MSIS00_IC',('SouthPole', "July"))) # 
-    mceq_run.set_theta_deg(angles[4])
+    mceq_run.set_theta_deg(angles[0])
 
     n_pts = 100
     X_grid = np.linspace(0.1, mceq_run.density_model.max_X, n_pts) # grid for spefic direction
@@ -144,7 +144,7 @@ def production_profile(conf_folders,interactionmodel,cs_k,cs_p,season, mceq_run)
     h = (h_msis[1:] + h_msis[:-1])/2 
 
     #read  calculated flux
-    flux = np.load(conf_folders['fluxes'] + "numu_"+ cs_p + "pion_" + cs_k + "kaon_" +  str(threshold) + "_" + increase + "_"+ interactionmodel +"_msis_sameheight_lowergrid_" + season+ ".npy")
+    flux = np.load(conf_folders['prod_profiles'] + "numu_"+ cs_p + "pion_" + cs_k + "kaon_" +  str(threshold) + "_" + increase + "_"+ interactionmodel +"_msis_sameheight_lowergrid_" + season+ ".npy")
    
     e_center = (mceq_run.e_bins[:-1] + mceq_run.e_bins[1:]) / 2
     mceq_interp_bin_mid = np.ndarray(shape=(100,5,len(bin_edges)-1),dtype="float") #acg per zenith band
