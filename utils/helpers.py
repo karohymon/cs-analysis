@@ -19,3 +19,9 @@ def angular_bins(ptype, nbins):
 
 def doys(frequency):
     return np.arange(1, 362, frequency, dtype=int)
+
+def ebins():
+    step = 0.3
+    bin_edges = np.logspace(2.1, 6, num=int((6 - 2.1) / step) + 1)
+
+    return bin_edges
