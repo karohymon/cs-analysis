@@ -69,7 +69,10 @@ def main(config_file,ptype, pr_factor):
     )
     
     # define angles and days for flux calculation
-    angles = angular_bins(ptype, 2)
+    angle_edges = angular_bins(ptype, 2)
+    angles = (angle_edges[:-1] + angle_edges[1:]) / 2
+
+    #correct for angles at bin center
     doy = doys(5) # take every 5th day for fast testing purposes
 
     # calculate flux
