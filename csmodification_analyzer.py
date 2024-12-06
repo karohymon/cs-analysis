@@ -8,6 +8,7 @@ import crflux.models as pm
 import scienceplots
 import scipy.optimize as opt
 from utils.helpers import *
+import matplotlib.gridspec as gridspec
 
 class SensitivityAnalyzer:
     def __init__(self, ptype, scale_factor_p, scale_factor_k, doys, threshold, increase, interactionmodel = None):
@@ -99,9 +100,13 @@ class SensitivityAnalyzer:
      
         energy = self.energybins_mceq()
       
+        if self.ptype == 'numu':
+            tag = ['allbins', 'rate']
 
-        tag = ['allbins', 'gev', 'rate']
-        for e in range(3):
+        elif self.ptype == 'mu':
+            tag = ['allbins', 'gev', 'rate']
+
+        for e in range(len(tag)):
             if e ==0 :
                 ebins = self.ebins_analysis()
             if e ==1: 
@@ -130,9 +135,9 @@ class SensitivityAnalyzer:
             plt.title('Daily Sensitivity Across the Year')
             plt.ylabel('Daily deviation from seasonal variation amplitude')
             if self.ptype == 'numu':
-                plt.ylim(0.99,1.01)
+                plt.ylim(0.98,1.02)
             elif self.ptype == 'mu':
-                plt.ylim(0.99,1.01)
+                plt.ylim(0.98,1.02)
             else:
                 print('particle type is not defined.')
                 exit()
@@ -189,3 +194,33 @@ class SensitivityAnalyzer:
             ax2.legend(fontsize = 'small',ncol=2)
             plt.grid(True)
             plt.savefig(f'/home/khymon/Plots/cs-analysis/sv_amplitude_mcs_allbins_{self.cs_mod}_zenith{np.round(angles_edges[j], decimals=0)}-{np.round(angles_edges[j + 1], decimals=0)}.png', bbox_inches='tight')
+
+    def plot_flux(self):
+
+        energy = self.energybins_mceq()   
+
+        flux_year_tuned = np.mean(self.flux_tuned, axis=1)
+        flux_year_untuned = np.mean(self.flux_untuned, axis=1)
+
+        fig = plt.figure(figsize=(12,6))
+        fig.tight_layout()
+
+        gs = gridspec.GridSpec(4, 1)
+        axes1 = fig.add_subplot(gs[:-2])
+        axes2 = fig.add_subplot(gs[-2], sharex=axes1)
+        fig.subplots_adjust(hspace = .001)
+
+        axes1.plot(energy,flux_year_untuned[0],label = 'untuned')
+        axes1.plot(energy,flux_year_tuned[0],label =  self.cs_mod, ls='--')
+        axes1.set_xscale('log')
+        axes1.set_yscale('log')
+        axes2.set_xlabel('$E$/GeV')
+        axes1.set_ylabel('flux')
+        axes1.set_xlim(1.e2,1e6)
+        axes1.set_ylim(1.e-20,1e-3)
+        axes1.legend(loc='upper right')
+
+        axes2.plot(energy,flux_year_tuned[0]/flux_year_untuned[0])
+        axes2.set_ylim(0.6,1.4)
+        axes2.set_ylabel('tuned/untuned')
+        fig.savefig(f'/home/khymon/Plots/cs-analysis/avgflux_{self.cs_mod}_zenith90-100.png', bbox_inches='tight')
