@@ -33,7 +33,22 @@ _, cos_thetas, cr_grid, ground_muspec_prim_energies_jan, ground_muspec_prim_ener
     open(pathlib.Path(__file__).parent / "ground_muspec_prim_energies_season.pkl", "rb")
 )
 
+# load cs checks
+
+_,cos_thetas, surface_flux_GSF_jan_p05, surface_flux_GSF_apr_p05,surface_flux_GSF_jul_p05 = pickle.load(
+    open("/hetghome/khymon/cs-analysis/surface_fluxes_season_pi0.5_k1.0_10000.0const.pkl", "rb")
+)
+
+_, cos_thetas, cr_grid, ground_muspec_prim_energies_jan_p05, ground_muspec_prim_energies_apr_p05, ground_muspec_prim_energies_jul_p05 = pickle.load(
+    open("/hetghome/khymon/cs-analysis/ground_muspec_prim_energies_season_cstune_pi0.5_k1.0_10000.0const.pkl", "rb")
+)
+
+
 # interpolate arrays
+ground_muspec_prim_energies_jan_p05 = np.asarray(ground_muspec_prim_energies_jan_p05).swapaxes(0, 1)
+ground_muspec_prim_energies_apr_p05 = np.asarray(ground_muspec_prim_energies_apr_p05).swapaxes(0, 1)
+ground_muspec_prim_energies_jul_p05 = np.asarray(ground_muspec_prim_energies_jul_p05).swapaxes(0, 1)
+
 ground_muspec_prim_energies_jan = np.asarray(ground_muspec_prim_energies_jan).swapaxes(0, 1)
 ground_muspec_prim_energies_apr = np.asarray(ground_muspec_prim_energies_apr).swapaxes(0, 1)
 ground_muspec_prim_energies_jul = np.asarray(ground_muspec_prim_energies_jul).swapaxes(0, 1)
@@ -51,6 +66,15 @@ intp_surface_flux_GSF_apr = ip.interp1d(cos_thetas, surface_flux_GSF_apr, axis=0
 
 surface_flux_GSF_jul = np.asarray(surface_flux_GSF_jul)
 intp_surface_flux_GSF_jul = ip.interp1d(cos_thetas, surface_flux_GSF_jul, axis=0, kind="linear")
+
+surface_flux_GSF_jan_p05 = np.asarray(surface_flux_GSF_jan_p05)
+intp_surface_flux_GSF_jan_p05 = ip.interp1d(cos_thetas, surface_flux_GSF_jan_p05, axis=0, kind="linear")
+
+surface_flux_GSF_apr_p05 = np.asarray(surface_flux_GSF_apr_p05)
+intp_surface_flux_GSF_apr_p05 = ip.interp1d(cos_thetas, surface_flux_GSF_apr_p05, axis=0, kind="linear")
+
+surface_flux_GSF_jul_p05 = np.asarray(surface_flux_GSF_jul_p05)
+intp_surface_flux_GSF_jul_p05 = ip.interp1d(cos_thetas, surface_flux_GSF_jul_p05, axis=0, kind="linear")
 
 intp_ground_mu_yields_jan = [
     ip.interp1d(
@@ -72,6 +96,28 @@ intp_ground_mu_yields_jul = [
     )
     for ie in range(len(cr_grid))
 ]
+
+intp_ground_mu_yields_jan_p05 = [
+    ip.interp1d(
+        cos_thetas, ground_muspec_prim_energies_jan_p05[:, ie, :], axis=0, kind="linear"
+    )
+    for ie in range(len(cr_grid))
+]
+
+intp_ground_mu_yields_apr_p05 = [
+    ip.interp1d(
+        cos_thetas, ground_muspec_prim_energies_apr_p05[:, ie, :], axis=0, kind="linear"
+    )
+    for ie in range(len(cr_grid))
+]
+
+intp_ground_mu_yields_jul_p05 = [
+    ip.interp1d(
+        cos_thetas, ground_muspec_prim_energies_jul_p05[:, ie, :], axis=0, kind="linear"
+    )
+    for ie in range(len(cr_grid))
+]
+
 dmnflux = Flux("IceCube")
 
 # Slant depths in [km.w.e.] and angles in [degrees]
@@ -170,6 +216,15 @@ def _flux(angle, flux_label, iecr=None):
     elif flux_label == 'jul':
         return intp_surface_flux_GSF_jul(cth)[:dim_ug]
     
+    elif flux_label == 'jan_p05':
+        return intp_surface_flux_GSF_jan_p05(cth)[:dim_ug]
+    
+    elif flux_label == 'apr_p05':
+        return intp_surface_flux_GSF_apr_p05(cth)[:dim_ug]
+    
+    elif flux_label == 'jul_p05':
+        return intp_surface_flux_GSF_jul_p05(cth)[:dim_ug]
+    
     elif flux_label == "yields_jan":
         assert iecr is not None
         return intp_ground_mu_yields_jan[iecr](cth)[:dim_ug]
@@ -181,6 +236,18 @@ def _flux(angle, flux_label, iecr=None):
     elif flux_label == "yields_jul":
         assert iecr is not None
         return intp_ground_mu_yields_jul[iecr](cth)[:dim_ug]
+    
+    elif flux_label == "yields_jan_p05":
+        assert iecr is not None
+        return intp_ground_mu_yields_jan_p05[iecr](cth)[:dim_ug]
+    
+    elif flux_label == "yields_apr_p05":
+        assert iecr is not None
+        return intp_ground_mu_yields_apr_p05[iecr](cth)[:dim_ug]
+    
+    elif flux_label == "yields_jul_p05":
+        assert iecr is not None
+        return intp_ground_mu_yields_jul_p05[iecr](cth)[:dim_ug]
     
     else:
         raise ValueError("Unknown flux label")
