@@ -454,24 +454,24 @@ def bundle_energy_dist(depth, angle, pmodel, norm=True):
     return eb_mu_spec / eb_mu_spec[0] if norm is True else eb_mu_spec
 
 
-def get_integrated_mult_dist(pmodel, norm=True):
-    mult_vec = np.array(
-        [
-            ug_mean_mult(integrated_flux(ground_muspec_prim_energies[ei]))
-            for ei, e_cr in enumerate(cr_grid)
-        ]
-    )
-    cr_grid_tr = cr_grid[mult_vec > 1e-2]
-    mult_vec = mult_vec[mult_vec > 1e-2]
-
-    s_ecr = ip.UnivariateSpline(np.log(mult_vec), np.log(cr_grid_tr))
-    s_nmu = ip.UnivariateSpline(np.log(cr_grid_tr), np.log(mult_vec))
-    sd_ecr = s_ecr.derivative()
-
-    ecr = lambda nmu: np.exp(s_ecr(np.log(nmu)))
-    nmu = lambda ecr: np.exp(s_nmu(np.log(ecr)))
-    decr = lambda nmu: np.exp(sd_ecr(np.log(nmu)))
-    n_mu_spec = np.zeros_like(n_mu_vec)
-    for inm, n_mu in enumerate(n_mu_vec):
-        n_mu_spec[inm] = np.sum(pmodel.tot_nucleon_flux(ecr(n_mu))) * 1e4 * decr(n_mu)
-    return n_mu_spec / n_mu_spec[0]
+#def get_integrated_mult_dist(pmodel, norm=True):
+#    mult_vec = np.array(
+#        [
+#            ug_mean_mult(integrated_flux(ground_muspec_prim_energies_apr[ei]))
+#            for ei, e_cr in enumerate(cr_grid)
+#        ]
+#    )
+#    cr_grid_tr = cr_grid[mult_vec > 1e-2]
+#    mult_vec = mult_vec[mult_vec > 1e-2]
+#
+#    s_ecr = ip.UnivariateSpline(np.log(mult_vec), np.log(cr_grid_tr))
+#    s_nmu = ip.UnivariateSpline(np.log(cr_grid_tr), np.log(mult_vec))
+#    sd_ecr = s_ecr.derivative()
+#
+#    ecr = lambda nmu: np.exp(s_ecr(np.log(nmu)))
+#    nmu = lambda ecr: np.exp(s_nmu(np.log(ecr)))
+#    decr = lambda nmu: np.exp(sd_ecr(np.log(nmu)))
+#    n_mu_spec = np.zeros_like(n_mu_vec)
+#    for inm, n_mu in enumerate(n_mu_vec):
+#        n_mu_spec[inm] = np.sum(pmodel.tot_nucleon_flux(ecr(n_mu))) * 1e4 * decr(n_mu)
+#    return n_mu_spec / n_mu_spec[0]
