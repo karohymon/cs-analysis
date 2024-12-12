@@ -291,7 +291,7 @@ def integrated_rates(depth, flux_label, iecr=None):
     )
 
 
-def mean_e(depth, angle, iecr, flcutoff=1e-15):
+def mean_e(depth, angle, iecr, flux_label, flcutoff=1e-15):
     """
     Calculate the mean energy.
 
@@ -303,7 +303,7 @@ def mean_e(depth, angle, iecr, flcutoff=1e-15):
     Returns:
         float: Mean energy.
     """
-    fl = flux(depth, angle, "yields", iecr)
+    fl = flux(depth, angle, flux_label, iecr)
     fl[fl <= 0.0] *= 0
     fl = np.nan_to_num(fl)
     assert np.sum(fl) > 0.0, "Flux is zero everywhere"
@@ -383,10 +383,10 @@ def integrated_mean_mult(depth, flux_label, iecr=None):
     )
 
 
-def mult_dist(depth, angle, pmodel, norm=True):
+def mult_dist(depth, angle, pmodel, flux_label,  norm=True):
     # Unweighted multiplicity vector for all CR energies at specific depth
     mult_vec = np.array(
-        [mean_mult(depth, angle, "yields", ei) for ei, e_cr in enumerate(cr_grid)]
+        [mean_mult(depth, angle, flux_label, ei) for ei, e_cr in enumerate(cr_grid)] #needs yields
     )
     # Truncate to only include energies with multiplicity > 1e-2
     cr_grid_tr = cr_grid[mult_vec > 1e-1]
