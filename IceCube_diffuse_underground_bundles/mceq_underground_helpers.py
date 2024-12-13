@@ -36,11 +36,11 @@ _, cos_thetas, cr_grid, ground_muspec_prim_energies_jan, ground_muspec_prim_ener
 # load cs checks
 
 _,cos_thetas, surface_flux_GSF_jan_p05, surface_flux_GSF_apr_p05,surface_flux_GSF_jul_p05 = pickle.load(
-    open("/hetghome/khymon/cs-analysis/surface_fluxes_season_pi0.5_k1.0_10000.0const.pkl", "rb")
+    open("/hetghome/khymon/cs-files/surface_fluxes_season_pi0.5_k1.0_10000.0const.pkl", "rb")
 )
 
 _, cos_thetas, cr_grid, ground_muspec_prim_energies_jan_p05, ground_muspec_prim_energies_apr_p05, ground_muspec_prim_energies_jul_p05 = pickle.load(
-    open("/hetghome/khymon/cs-analysis/ground_muspec_prim_energies_season_cstune_pi0.5_k1.0_10000.0const.pkl", "rb")
+    open("/hetghome/khymon/cs-files/ground_muspec_prim_energies_season_cstune_pi0.5_k1.0_10000.0const.pkl", "rb")
 )
 
 _,cos_thetas, surface_flux_GSF_jan_p15, surface_flux_GSF_apr_p15,surface_flux_GSF_jul_p15 = pickle.load(
