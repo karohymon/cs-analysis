@@ -114,8 +114,9 @@ def main(scale_factor_p, scale_factor_k, threshold,increase,interactionmodel):
                 mceq_tune.solve()
                 theta_energies[ia, :] = mceq_tune.get_solution("mu+", mag=0) + mceq_tune.get_solution("mu-", mag=0)
             
-        season_energies.append(theta_energies)
-    # Append the results for the current season
+            season_energies.append(theta_energies)
+        # Append the results for the current season
+        ground_muspec_prim_energies.append(season_energies)
 
     pickle.dump(
         [mceq_air.e_grid, cos_thetas, cr_grid, ground_muspec_prim_energies[0], ground_muspec_prim_energies[1], ground_muspec_prim_energies[2]],
