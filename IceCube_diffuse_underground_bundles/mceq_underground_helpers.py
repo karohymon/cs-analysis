@@ -319,6 +319,15 @@ def _flux(angle, flux_label, iecr=None):
     elif flux_label == 'jul_p15':
         return intp_surface_flux_GSF_jul_p15(cth)[:dim_ug]
     
+    elif flux_label == 'jan_p15_fe':
+        return intp_surface_flux_GSF_jan_p15_fe(cth)[:dim_ug]
+    
+    elif flux_label == 'apr_p15_fe':
+        return intp_surface_flux_GSF_apr_p15_fe(cth)[:dim_ug]
+    
+    elif flux_label == 'jul_p15_fe':
+        return intp_surface_flux_GSF_jul_p15_fe(cth)[:dim_ug]
+    
     elif flux_label == "yields_jan":
         assert iecr is not None
         return intp_ground_mu_yields_jan[iecr](cth)[:dim_ug]
