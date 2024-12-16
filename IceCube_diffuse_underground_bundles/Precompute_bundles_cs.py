@@ -27,14 +27,17 @@ from cs_modifier import ModIntCrossSections
 @click.option('--threshold','-t', help='threshold above which modification is applied', default='1.e4')
 @click.option('--increase','-i', help='const or exp', default='const')
 @click.option('--interactionmodel','-m', help='hadr. interaction model', default="SIBYLL2.3c")
+@click.option('--nucleus','-n', help='proton: 2212 or iron: 5626', default="2212")
 
-def main(scale_factor_p, scale_factor_k, threshold,increase,interactionmodel):
+
+def main(scale_factor_p, scale_factor_k, threshold,increase,interactionmodel,nucleus):
 
 
     scale_factor_p = float(f'{scale_factor_p}')
     scale_factor_k = float(f'{scale_factor_k}')
     threshold = float(f'{threshold}')
     increase = f'{increase}'
+    nucleus = int(f'{nucleus}')
 
     scale_factor = [scale_factor_p,scale_factor_k]
 
@@ -104,7 +107,7 @@ def main(scale_factor_p, scale_factor_k, threshold,increase,interactionmodel):
         season_energies = []  # Temporary container for the current season's results
         for ei, eprim in enumerate(tqdm(cr_grid)):  # Loop over primary energies
             theta_energies = np.zeros((thetas.shape[0], mceq_air.dim))
-            mceq_tune.set_single_primary_particle(E=eprim, pdg_id=2212)
+            mceq_tune.set_single_primary_particle(E=eprim, pdg_id=nucleus)
             for ia, theta in enumerate(thetas):  # Loop over angles
                 mceq_tune.set_theta_deg(theta)
                 
@@ -120,11 +123,11 @@ def main(scale_factor_p, scale_factor_k, threshold,increase,interactionmodel):
 
     pickle.dump(
         [mceq_air.e_grid, cos_thetas, cr_grid, ground_muspec_prim_energies[0], ground_muspec_prim_energies[1], ground_muspec_prim_energies[2]],
-        open("/hetghome/khymon/cs-files/ground_muspec_prim_energies_season_cstune_pi" + str(scale_factor_p) + "_k" + str(scale_factor_k) + "_" +str(threshold)+ str(increase)+ ".pkl", "wb"),
+        open("/hetghome/khymon/cs-files/ground_muspec_prim_energies_season_cstune" + str(nucleus) + "_pi" + str(scale_factor_p) + "_k" + str(scale_factor_k) + "_" +str(threshold)+ str(increase)+ ".pkl", "wb"),
     )
     pickle.dump(
         [mceq_air.e_grid, cos_thetas, surface_flux_GSF[0], surface_flux_GSF[1] , surface_flux_GSF[2]],
-        open("/hetghome/khymon/cs-files/surface_fluxes_season_pi" + str(scale_factor_p) + "_k" + str(scale_factor_k) + "_" +str(threshold)+ str(increase)+ ".pkl", "wb"),
+        open("/hetghome/khymon/cs-files/surface_fluxes_season" + str(nucleus) + "_pi" + str(scale_factor_p) + "_k" + str(scale_factor_k) + "_" +str(threshold)+ str(increase)+ ".pkl", "wb"),
     )
 
     
