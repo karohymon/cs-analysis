@@ -118,11 +118,11 @@ class SensitivityAnalyzer:
             self.sv_amplitude_untuned = self.get_sv_amplitude(self.flux_untuned, energy, ebins, angles_edges, self.doys)
 
             overall_deviation = np.ndarray(shape=(len(angles_edges) - 1, len(ebins)), dtype=float)
-            sensitivity = self.sv_amplitude_tuned / self.sv_amplitude_untuned # change this line
+            self.sensitivity = self.sv_amplitude_tuned / self.sv_amplitude_untuned # change this line
 
             for j in range(len(angles_edges) - 1):
                 for i in range(len(ebins) - 1):
-                    overall_deviation[j][i] = np.sum(np.abs(sensitivity[j][i] - 1))
+                    overall_deviation[j][i] = np.sum(np.abs(self.sensitivity[j][i] - 1))
 
             plt.figure(figsize=(12, 6))
             if e == 0:
@@ -130,7 +130,7 @@ class SensitivityAnalyzer:
             else:
                 plotlooplength = len(ebins) -1
             for i in range(plotlooplength):
-                plt.plot(self.doys, sensitivity[0][i], marker='.', linestyle='-', label=f"{np.round(np.log10(ebins[i]), decimals=1)} $\leq$ log(E/GeV) $\leq$ {np.round(np.log10(ebins[i + 1]), decimals=1)}")
+                plt.plot(self.doys, self.sensitivity[0][i], marker='.', linestyle='-', label=f"{np.round(np.log10(ebins[i]), decimals=1)} $\leq$ log(E/GeV) $\leq$ {np.round(np.log10(ebins[i + 1]), decimals=1)}")
             plt.axhline(y=1, color='black', linestyle='--', label='Original Value')
             plt.title('Daily Sensitivity Across the Year')
             plt.ylabel('Daily deviation from seasonal variation amplitude')
@@ -147,6 +147,29 @@ class SensitivityAnalyzer:
             plt.grid(True)
             plt.text(50,0.99,f'{self.ptype} {self.scale_factor_k}xkaon {self.scale_factor_p}pion threshold{self.threshold}GeV')
             plt.savefig(f'/home/khymon/Plots/cs-analysis/sv_amplitude_mcs_{tag[e]}_dailysensitivity{self.cs_mod}_zenith{np.round(angles_edges[0], decimals=0)}-{np.round(angles_edges[1], decimals=0)}.png', bbox_inches='tight')
+
+            return self.sensitivity
+
+    
+    def season_analysis(self):
+        self.sensitivity = self.deviation_sv_amplitude_plot()
+        ebins =  self.ebins_analysis()
+
+        # choose bins to analyze
+        for j in range(len(ebins)):
+            y_pos[j] = self.sensitivity[0,self.sensitivity[0][j]>=0.]
+            y_neg[j] = self.sensitivity[0,self.sensitivity[0][j]<0.]
+         
+            
+
+            x_pos[j] = self.doys[self.sensitivity[0][j]>=0.] 
+            x_neg[j] = self.doys[self.sensitivity[0][j]<0.]
+
+
+            x_max[j] = self.doys(np.argmax(self.sensitivity[0][j]))
+            x_min[j] = self.doys(np.argmin(self.sensitivity[0][j]))
+
+        return x_min, x_max, x_neg, y_neg, x_pos, y_pos
 
     def sv_amplitude_plot(self):
         angles_edges  = angular_bins(self.ptype, 2)
