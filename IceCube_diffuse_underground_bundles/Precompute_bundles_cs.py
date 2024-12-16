@@ -107,7 +107,10 @@ def main(scale_factor_p, scale_factor_k, threshold,increase,interactionmodel,nuc
         season_energies = []  # Temporary container for the current season's results
         for ei, eprim in enumerate(tqdm(cr_grid)):  # Loop over primary energies
             theta_energies = np.zeros((thetas.shape[0], mceq_air.dim))
-            mceq_tune.set_single_primary_particle(E=eprim, pdg_id=nucleus)
+            if nucleus==2212:
+                mceq_tune.set_single_primary_particle(E=eprim, pdg_id=nucleus)
+            else:
+                mceq_tune.set_single_primary_particle(E=eprim, corsika_id=nucleus)
             for ia, theta in enumerate(thetas):  # Loop over angles
                 mceq_tune.set_theta_deg(theta)
                 
