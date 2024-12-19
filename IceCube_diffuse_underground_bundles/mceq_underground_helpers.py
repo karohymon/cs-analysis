@@ -59,6 +59,23 @@ _, cos_thetas, cr_grid, ground_muspec_prim_energies_jan_p15_fe, ground_muspec_pr
     open("/hetghome/khymon/cs-files/ground_muspec_prim_energies_season_cstune5626_pi1.5_k1.0_10000.0const.pkl", "rb")
 )
 
+_,cos_thetas, surface_flux_GSF_jan_p05_fe, surface_flux_GSF_apr_p05_fe,surface_flux_GSF_jul_p05_fe = pickle.load(
+    open("/hetghome/khymon/cs-files/surface_fluxes_season5626_pi0.5_k1.0_10000.0const.pkl", "rb")
+)
+
+_, cos_thetas, cr_grid, ground_muspec_prim_energies_jan_p05_fe, ground_muspec_prim_energies_apr_p05_fe, ground_muspec_prim_energies_jul_p05_fe = pickle.load(
+    open("/hetghome/khymon/cs-files/ground_muspec_prim_energies_season_cstune5626_pi0.5_k1.0_10000.0const.pkl", "rb")
+)
+
+_,cos_thetas, surface_flux_GSF_jan_fe, surface_flux_GSF_apr_fe,surface_flux_GSF_jul_fe = pickle.load(
+    open("/hetghome/khymon/cs-files/surface_fluxes_season5626_pi1.0_k1.0_10000.0const.pkl", "rb")
+)
+
+_, cos_thetas, cr_grid, ground_muspec_prim_energies_jan_fe, ground_muspec_prim_energies_apr_fe, ground_muspec_prim_energies_jul_fe = pickle.load(
+    open("/hetghome/khymon/cs-files/ground_muspec_prim_energies_season_cstune5626_pi1.0_k1.0_10000.0const.pkl", "rb")
+)
+
+
 
 # interpolate arrays
 ground_muspec_prim_energies_jan_p05 = np.asarray(ground_muspec_prim_energies_jan_p05).swapaxes(0, 1)
@@ -72,6 +89,14 @@ ground_muspec_prim_energies_jul_p15 = np.asarray(ground_muspec_prim_energies_jul
 ground_muspec_prim_energies_jan_p15_fe = np.asarray(ground_muspec_prim_energies_jan_p15_fe).swapaxes(0, 1)
 ground_muspec_prim_energies_apr_p15_fe = np.asarray(ground_muspec_prim_energies_apr_p15_fe).swapaxes(0, 1)
 ground_muspec_prim_energies_jul_p15_fe = np.asarray(ground_muspec_prim_energies_jul_p15_fe).swapaxes(0, 1)
+
+ground_muspec_prim_energies_jan_p05_fe = np.asarray(ground_muspec_prim_energies_jan_p05_fe).swapaxes(0, 1)
+ground_muspec_prim_energies_apr_p05_fe = np.asarray(ground_muspec_prim_energies_apr_p05_fe).swapaxes(0, 1)
+ground_muspec_prim_energies_jul_p05_fe = np.asarray(ground_muspec_prim_energies_jul_p05_fe).swapaxes(0, 1)
+
+ground_muspec_prim_energies_jan_fe = np.asarray(ground_muspec_prim_energies_jan_fe).swapaxes(0, 1)
+ground_muspec_prim_energies_apr_fe = np.asarray(ground_muspec_prim_energies_apr_fe).swapaxes(0, 1)
+ground_muspec_prim_energies_jul_fe = np.asarray(ground_muspec_prim_energies_jul_fe).swapaxes(0, 1)
 
 ground_muspec_prim_energies_jan = np.asarray(ground_muspec_prim_energies_jan).swapaxes(0, 1)
 ground_muspec_prim_energies_apr = np.asarray(ground_muspec_prim_energies_apr).swapaxes(0, 1)
@@ -117,6 +142,25 @@ intp_surface_flux_GSF_apr_p15_fe = ip.interp1d(cos_thetas, surface_flux_GSF_apr_
 
 surface_flux_GSF_jul_p15_fe = np.asarray(surface_flux_GSF_jul_p15_fe)
 intp_surface_flux_GSF_jul_p15_fe = ip.interp1d(cos_thetas, surface_flux_GSF_jul_p15_fe, axis=0, kind="linear")
+
+surface_flux_GSF_jan_p05_fe = np.asarray(surface_flux_GSF_jan_p05_fe)
+intp_surface_flux_GSF_jan_p05_fe = ip.interp1d(cos_thetas, surface_flux_GSF_jan_p05_fe, axis=0, kind="linear")
+
+surface_flux_GSF_apr_p05_fe = np.asarray(surface_flux_GSF_apr_p05_fe)
+intp_surface_flux_GSF_apr_p05_fe = ip.interp1d(cos_thetas, surface_flux_GSF_apr_p05_fe, axis=0, kind="linear")
+
+surface_flux_GSF_jul_p05_fe = np.asarray(surface_flux_GSF_jul_p05_fe)
+intp_surface_flux_GSF_jul_p05_fe = ip.interp1d(cos_thetas, surface_flux_GSF_jul_p05_fe, axis=0, kind="linear")
+
+surface_flux_GSF_jan_fe = np.asarray(surface_flux_GSF_jan_fe)
+intp_surface_flux_GSF_jan_fe = ip.interp1d(cos_thetas, surface_flux_GSF_jan_fe, axis=0, kind="linear")
+
+surface_flux_GSF_apr_fe = np.asarray(surface_flux_GSF_apr_fe)
+intp_surface_flux_GSF_apr_fe = ip.interp1d(cos_thetas, surface_flux_GSF_apr_fe, axis=0, kind="linear")
+
+surface_flux_GSF_jul_fe = np.asarray(surface_flux_GSF_jul_fe)
+intp_surface_flux_GSF_jul_fe = ip.interp1d(cos_thetas, surface_flux_GSF_jul_fe, axis=0, kind="linear")
+
 
 intp_ground_mu_yields_jan = [
     ip.interp1d(
@@ -198,6 +242,48 @@ intp_ground_mu_yields_apr_p15_fe = [
 intp_ground_mu_yields_jul_p15_fe = [
     ip.interp1d(
         cos_thetas, ground_muspec_prim_energies_jul_p15_fe[:, ie, :], axis=0, kind="linear"
+    )
+    for ie in range(len(cr_grid))
+]
+
+intp_ground_mu_yields_jan_p05_fe = [
+    ip.interp1d(
+        cos_thetas, ground_muspec_prim_energies_jan_p05_fe[:, ie, :], axis=0, kind="linear"
+    )
+    for ie in range(len(cr_grid))
+]
+
+intp_ground_mu_yields_apr_p05_fe = [
+    ip.interp1d(
+        cos_thetas, ground_muspec_prim_energies_apr_p05_fe[:, ie, :], axis=0, kind="linear"
+    )
+    for ie in range(len(cr_grid))
+]
+
+intp_ground_mu_yields_jul_p05_fe = [
+    ip.interp1d(
+        cos_thetas, ground_muspec_prim_energies_jul_p05_fe[:, ie, :], axis=0, kind="linear"
+    )
+    for ie in range(len(cr_grid))
+]
+
+intp_ground_mu_yields_jan_fe = [
+    ip.interp1d(
+        cos_thetas, ground_muspec_prim_energies_jan_fe[:, ie, :], axis=0, kind="linear"
+    )
+    for ie in range(len(cr_grid))
+]
+
+intp_ground_mu_yields_apr_fe = [
+    ip.interp1d(
+        cos_thetas, ground_muspec_prim_energies_apr_fe[:, ie, :], axis=0, kind="linear"
+    )
+    for ie in range(len(cr_grid))
+]
+
+intp_ground_mu_yields_jul_fe = [
+    ip.interp1d(
+        cos_thetas, ground_muspec_prim_energies_jul_fe[:, ie, :], axis=0, kind="linear"
     )
     for ie in range(len(cr_grid))
 ]
@@ -319,6 +405,15 @@ def _flux(angle, flux_label, iecr=None):
     elif flux_label == 'jul_p15':
         return intp_surface_flux_GSF_jul_p15(cth)[:dim_ug]
     
+    elif flux_label == 'jan_p05_fe':
+        return intp_surface_flux_GSF_jan_p05_fe(cth)[:dim_ug]
+    
+    elif flux_label == 'apr_p05_fe':
+        return intp_surface_flux_GSF_apr_p05_fe(cth)[:dim_ug]
+    
+    elif flux_label == 'jul_p05_fe':
+        return intp_surface_flux_GSF_jul_p05_fe(cth)[:dim_ug]
+    
     elif flux_label == 'jan_p15_fe':
         return intp_surface_flux_GSF_jan_p15_fe(cth)[:dim_ug]
     
@@ -327,6 +422,15 @@ def _flux(angle, flux_label, iecr=None):
     
     elif flux_label == 'jul_p15_fe':
         return intp_surface_flux_GSF_jul_p15_fe(cth)[:dim_ug]
+    
+    elif flux_label == 'jan_fe':
+        return intp_surface_flux_GSF_jan_fe(cth)[:dim_ug]
+    
+    elif flux_label == 'apr_fe':
+        return intp_surface_flux_GSF_apr_fe(cth)[:dim_ug]
+    
+    elif flux_label == 'jul_fe':
+        return intp_surface_flux_GSF_jul_fe(cth)[:dim_ug]
     
     elif flux_label == "yields_jan":
         assert iecr is not None
@@ -364,6 +468,18 @@ def _flux(angle, flux_label, iecr=None):
         assert iecr is not None
         return intp_ground_mu_yields_jul_p15[iecr](cth)[:dim_ug]
     
+    elif flux_label == "yields_jan_p05_fe":
+        assert iecr is not None
+        return intp_ground_mu_yields_jan_p05_fe[iecr](cth)[:dim_ug]
+    
+    elif flux_label == "yields_apr_p05_fe":
+        assert iecr is not None
+        return intp_ground_mu_yields_apr_p05_fe[iecr](cth)[:dim_ug]
+    
+    elif flux_label == "yields_jul_p05_fe":
+        assert iecr is not None
+        return intp_ground_mu_yields_jul_p05_fe[iecr](cth)[:dim_ug]
+    
     elif flux_label == "yields_jan_p15_fe":
         assert iecr is not None
         return intp_ground_mu_yields_jan_p15_fe[iecr](cth)[:dim_ug]
@@ -375,6 +491,18 @@ def _flux(angle, flux_label, iecr=None):
     elif flux_label == "yields_jul_p15_fe":
         assert iecr is not None
         return intp_ground_mu_yields_jul_p15_fe[iecr](cth)[:dim_ug]
+    
+    elif flux_label == "yields_jan_fe":
+        assert iecr is not None
+        return intp_ground_mu_yields_jan_fe[iecr](cth)[:dim_ug]
+    
+    elif flux_label == "yields_apr_fe":
+        assert iecr is not None
+        return intp_ground_mu_yields_apr_fe[iecr](cth)[:dim_ug]
+    
+    elif flux_label == "yields_jul_fe":
+        assert iecr is not None
+        return intp_ground_mu_yields_jul_fe[iecr](cth)[:dim_ug]
     
     else:
         raise ValueError("Unknown flux label")
