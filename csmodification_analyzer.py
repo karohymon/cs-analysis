@@ -152,24 +152,42 @@ class SensitivityAnalyzer:
 
     
     def season_analysis(self):
+
+        angles_edges =  angular_bins(self.ptype, 2)
+        energy = self.energybins_mceq()
+        ebins = self.ebins_analysis()      
+
+        self.sv_amplitude_tuned = self.get_sv_amplitude(self.flux_tuned, energy, ebins, angles_edges, self.doys)
         self.sensitivity = self.deviation_sv_amplitude_plot()
+        sens = self.sensitivity[0]
         ebins =  self.ebins_analysis()
+        print(sens[8])
+        x_min = np.zeros(len(ebins))
+        x_max = np.zeros(len(ebins))
 
-        # choose bins to analyze
-        for j in range(len(ebins)):
-            y_pos[j] = self.sensitivity[0,self.sensitivity[0][j]>=0.]
-            y_neg[j] = self.sensitivity[0,self.sensitivity[0][j]<0.]
-         
-            
+        y_min = np.zeros(len(ebins))
+        y_max = np.zeros(len(ebins))
 
-            x_pos[j] = self.doys[self.sensitivity[0][j]>=0.] 
-            x_neg[j] = self.doys[self.sensitivity[0][j]<0.]
+        # Initialize lists to store results
+        min_indices = []
+        max_indices = []
 
+        for j in range(min(len(ebins)-1, sens.shape[0])):  # Ensure indices are within bounds
+            indices = np.where(sens[j, :] > 1)[0]  # Find indices where values are > 0
+        if len(indices) > 0:  # Check if there are any values > 0
+            min_indices.append(indices.min())  # Minimum index
+            max_indices.append(indices.max())  # Maximum index
+        else:
+            min_indices.append(None)  # No values > 0, store None
+            max_indices.append(None)
+                    
+            y_max[j] = self.sv_amplitude_tuned[0,j,np.argmax(sens[j])]
+            y_min[j] = self.sv_amplitude_tuned[0,j,np.argmin(sens[j])]
+            x_max[j] = self.doys[np.argmax(sens[j])]
+            x_min[j] = self.doys[np.argmin(sens[j])]
 
-            x_max[j] = self.doys(np.argmax(self.sensitivity[0][j]))
-            x_min[j] = self.doys(np.argmin(self.sensitivity[0][j]))
-
-        return x_min, x_max, x_neg, y_neg, x_pos, y_pos
+            print(x_max[j])
+        return x_min, x_max, y_min, y_max, min_indices, max_indices
 
     def sv_amplitude_plot(self):
         angles_edges  = angular_bins(self.ptype, 2)
