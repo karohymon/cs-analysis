@@ -161,7 +161,7 @@ class SensitivityAnalyzer:
         self.sensitivity = self.deviation_sv_amplitude_plot()
         sens = self.sensitivity[0]
         ebins =  self.ebins_analysis()
-        print(sens[8])
+       
         x_min = np.zeros(len(ebins))
         x_max = np.zeros(len(ebins))
 
@@ -174,19 +174,18 @@ class SensitivityAnalyzer:
 
         for j in range(min(len(ebins)-1, sens.shape[0])):  # Ensure indices are within bounds
             indices = np.where(sens[j, :] > 1)[0]  # Find indices where values are > 0
-        if len(indices) > 0:  # Check if there are any values > 0
-            min_indices.append(indices.min())  # Minimum index
-            max_indices.append(indices.max())  # Maximum index
-        else:
-            min_indices.append(None)  # No values > 0, store None
-            max_indices.append(None)
+            if len(indices) > 0:  # Check if there are any values > 0
+                min_indices.append(indices.min())  # Minimum index
+                max_indices.append(indices.max())  # Maximum index
+            else:
+                min_indices.append(None)  # No values > 0, store None
+                max_indices.append(None)
                     
             y_max[j] = self.sv_amplitude_tuned[0,j,np.argmax(sens[j])]
             y_min[j] = self.sv_amplitude_tuned[0,j,np.argmin(sens[j])]
             x_max[j] = self.doys[np.argmax(sens[j])]
             x_min[j] = self.doys[np.argmin(sens[j])]
 
-            print(x_max[j])
         return x_min, x_max, y_min, y_max, min_indices, max_indices
 
     def sv_amplitude_plot(self):
