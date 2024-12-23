@@ -172,7 +172,7 @@ class SensitivityAnalyzer:
         min_indices = []
         max_indices = []
 
-        for j in range(min(len(ebins)-1, sens.shape[0])):  # Ensure indices are within bounds
+        for j in range((len(ebins)-1, sens.shape[0])):  # Ensure indices are within bounds
             indices = np.where(sens[j, :] > 1)[0]  # Find indices where values are > 0
             if len(indices) > 0:  # Check if there are any values > 0
                 min_indices.append(indices.min())  # Minimum index
