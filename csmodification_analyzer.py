@@ -147,9 +147,54 @@ class SensitivityAnalyzer:
             plt.grid(True)
             plt.text(50,0.99,f'{self.ptype} {self.scale_factor_k}xkaon {self.scale_factor_p}pion threshold{self.threshold}GeV')
             plt.savefig(f'/home/khymon/Plots/cs-analysis/sv_amplitude_mcs_{tag[e]}_dailysensitivity{self.cs_mod}_zenith{np.round(angles_edges[0], decimals=0)}-{np.round(angles_edges[1], decimals=0)}.png', bbox_inches='tight')
-
+          
             return self.sensitivity
+        
+    def sensitivity_plot(self):
+        angles_edges =  angular_bins(self.ptype, 2)
+     
+        energy = self.energybins_mceq()
+        ebins = self.ebins_analysis()
+           
+        self.sv_amplitude_tuned = self.get_sv_amplitude(self.flux_tuned, energy, ebins, angles_edges, self.doys)
+        self.sv_amplitude_untuned = self.get_sv_amplitude(self.flux_untuned, energy, ebins, angles_edges, self.doys)
 
+        overall_deviation = np.ndarray(shape=(len(angles_edges) - 1, len(ebins)), dtype=float)
+        self.sensitivity = self.sv_amplitude_tuned / self.sv_amplitude_untuned # change this line
+
+        for j in range(len(angles_edges) - 1):
+            for i in range(len(ebins) - 1):
+                overall_deviation[j][i] = np.sum(np.abs(self.sensitivity[j][i] - 1))
+
+        plt.figure(figsize=(12, 6))
+        plotlooplength = len(ebins) - 4 # for analysis energy bins
+        
+        if self.scale_factor_k != 1.:
+            if self.scale_factor_k > 1.:
+                scale_fac = self.scale_factor_k - 1.
+            else:
+                scale_fac =  -self.scale_factor_k
+        elif self.scale_factor_p != 1.:
+            if self.scale_factor_p > 1.:
+                scale_fac = self.scale_factor_p -1.
+            else:
+                scale_fac = - self.scale_factor_p
+
+        for i in range(plotlooplength):
+                plt.plot(self.doys, self.sensitivity[0][i]/scale_fac, marker='.', linestyle='-', label=f"{np.round(np.log10(ebins[i]), decimals=1)} $\leq$ log(E/GeV) $\leq$ {np.round(np.log10(ebins[i + 1]), decimals=1)}")
+            
+        print('scale factor =', scale_fac)
+        plt.ylabel('d amplt. / d$\sigma')
+       
+        plt.xlabel('Day of Year')
+        plt.xlim()
+        plt.legend(ncol=2)
+        plt.grid(True)
+        plt.title(f'{self.ptype} {self.scale_factor_k}xkaon {self.scale_factor_p}pion threshold{self.threshold}GeV')
+        plt.savefig(f'/home/khymon/Plots/cs-analysis/sv_amplitude_dcs_dailysensitivity{self.cs_mod}_zenith{np.round(angles_edges[0], decimals=0)}-{np.round(angles_edges[1], decimals=0)}.png', bbox_inches='tight')
+
+
+            
     
     def season_analysis(self):
 
