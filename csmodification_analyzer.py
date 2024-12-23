@@ -162,17 +162,17 @@ class SensitivityAnalyzer:
         sens = self.sensitivity[0]
         ebins =  self.ebins_analysis()
        
-        x_min = np.zeros(len(ebins))
-        x_max = np.zeros(len(ebins))
+        x_min = np.zeros(len(ebins)-1)
+        x_max = np.zeros(len(ebins)-1)
 
-        y_min = np.zeros(len(ebins))
-        y_max = np.zeros(len(ebins))
+        y_min = np.zeros(len(ebins)-1)
+        y_max = np.zeros(len(ebins)-1)
 
         # Initialize lists to store results
         min_indices = []
         max_indices = []
 
-        for j in range((len(ebins)-1, sens.shape[0])):  # Ensure indices are within bounds
+        for j in range(min(len(ebins)-1, sens.shape[0])):  # Ensure indices are within bounds
             indices = np.where(sens[j, :] > 1)[0]  # Find indices where values are > 0
             if len(indices) > 0:  # Check if there are any values > 0
                 min_indices.append(indices.min())  # Minimum index
