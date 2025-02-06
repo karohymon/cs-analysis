@@ -23,16 +23,17 @@ cs_dir = pathlib.Path("/hetghome/khymon/cs-files")  # Cross-section tuned files
 
 # Generate flux file paths dynamically
 flux_files = {
-    (ptype, cs): cs_dir / f"surface_fluxes_season{ptype}_pi{cs}_k1.0_10000.0const.pkl"
+    (ptype, round(cs, 1)): cs_dir / f"surface_fluxes_season{ptype}_pi{cs:.1f}_k1.0_10000.0const.pkl"
     for ptype in [2212, 5626]  # Proton, Iron
-    for cs in np.arange(0.5, 1.6, 0.1)  # CS values: 0.5, 1.0, 1.5
+    for cs in np.round(np.arange(0.5, 1.6, 0.1), 1)  # Ensure precise values
 }
 
 muspec_files = {
-    (ptype, cs): cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs}_k1.0_10000.0const.pkl"
+    (ptype, round(cs, 1)): cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs:.1f}_k1.0_10000.0const.pkl"
     for ptype in [2212, 5626]
-    for cs in np.arange(0.5, 1.6, 0.1)
+    for cs in np.round(np.arange(0.5, 1.6, 0.1), 1)  # Fix floating-point precision
 }
+
 
 # Load and store fluxes dynamically
 surface_fluxes = {}
@@ -177,6 +178,9 @@ def _flux(angle, flux_label, ptype=2212, cs=1.0, iecr=None): # added new argumen
         return intp_surface_fluxes[key][flux_label](cth)[:dim_ug] # for calling jan, apr, jul
     elif iecr is not None and flux_label in intp_ground_mu_yields.get(key, {}):
         return intp_ground_mu_yields[key][flux_label][iecr](cth)[:dim_ug]
+    elif flux_label == "yields_jan":
+        assert iecr is not None
+        return intp_ground_mu_yields[(ptype, cs)]["jan"][iecr](cth)[:dim_ug]
     elif flux_label == "yields_apr":
         assert iecr is not None
         return intp_ground_mu_yields[(ptype, cs)]["apr"][iecr](cth)[:dim_ug]
