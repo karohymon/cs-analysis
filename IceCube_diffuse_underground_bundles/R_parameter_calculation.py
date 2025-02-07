@@ -69,8 +69,8 @@ def R(m,dN_dNmu):
     int_low = np.zeros(len(dN_dNmu[:,0]))
     int_high = np.zeros(len(dN_dNmu[:,0]))
     for i in range(len(dN_dNmu[:,0])):
-        int_low = np.trapezoid(dN_dNmu[i,1:19],m[1:19])
-        int_high = np.trapezoid(dN_dNmu[i,59:],m[59:])    
+        int_low[i] = np.trapezoid(dN_dNmu[i,1:19],m[1:19])
+        int_high[i] = np.trapezoid(dN_dNmu[i,59:],m[59:])    
 
     return int_high / int_low
 
@@ -103,6 +103,7 @@ def main():
        
         x_mod = X(d) # for specific depth  
 
+        
         for cs in cs_values:
             for ptype in ptype_values:
                 for season in season_values:
@@ -110,8 +111,8 @@ def main():
 
                     dNmu_dmu_mod = dNmu_dmu(d,season, ptype , cs)
                     R_mod = R(m,dNmu_dmu_mod)
-                    R_norm = R_normalized(m,R_mod,x_mod,ptype)
-                          
+                    R_norm = R_normalized(m,R_mod,d,ptype)
+                        
                     # Store the result in the dictionary
                     results[(str(d), str(cs), str(ptype), season)] = R_norm
 
