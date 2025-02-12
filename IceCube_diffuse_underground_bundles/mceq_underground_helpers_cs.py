@@ -24,7 +24,7 @@ cs_dir = pathlib.Path("/hetghome/khymon/cs-files")  # Cross-section tuned files
 # Generate flux file paths dynamically
 flux_files = {
     (ptype, round(cs, 1)): cs_dir / f"surface_fluxes_season{ptype}_pi{cs:.1f}_k1.0_10000.0const.pkl"
-    for ptype in [2212, 402, 5626]  # Proton, Iron
+    for ptype in [2212, 402, 1608, 5626]  # Proton, Iron
     for cs in np.round(np.arange(0.5, 1.6, 0.1), 1)  # Ensure precise values
 }
 
@@ -160,7 +160,7 @@ def _flux(angle, flux_label, ptype=2212, cs=1.0, iecr=None): # added new argumen
     Args:
         angle (float): Angle in degrees.
         flux_label (str): Flux type ('jan', 'apr', 'jul', 'yields_apr', 'yields_jul').
-        ptype (int): Primary particle type (2212 = proton, 5626 = iron).
+        ptype (int): Primary particle type (2212 = proton, 402 = helium, 5626 = iron).
         cs (float): Cross-section scaling factor (0.5, 1.0, 1.5).
         iecr (int, optional): Energy index for ground muon spectrum.
 

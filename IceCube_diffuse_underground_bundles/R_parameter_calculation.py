@@ -96,7 +96,7 @@ def main():
 
     d_values = [1.5, 3.5]# detectpr depth: 1.5 or 3.5km
     cs_values = [0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
-    ptype_values = [2212, 5626]  # particle types
+    ptype_values = [2212, 402, 1608, 5626]  # particle types
     season_values = ["jan", "apr", "jul"]  #  seasons
 
     for d in d_values:  
