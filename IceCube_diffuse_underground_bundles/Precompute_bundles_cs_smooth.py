@@ -52,7 +52,7 @@ def main(scale_factor_p1, scale_factor_p2, scale_factor_k1, scale_factor_k2, e0,
 
     # convert to list for input into class
     scale_factor_region1 = [scale_factor_p1,scale_factor_k1]
-    scale_factor_region2 = [scale_factor_p1,scale_factor_k2]
+    scale_factor_region2 = [scale_factor_p2,scale_factor_k2]
 
     #initialize mceq instances
     mceq_tune = MCEqRun(
