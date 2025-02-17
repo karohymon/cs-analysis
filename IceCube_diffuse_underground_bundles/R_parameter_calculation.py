@@ -87,7 +87,7 @@ def R_normalized(m,R_mod,d,ptype):
     
     return R_mod/R_def_apr
 
-def main(smooth_transition):
+def main():
    
     m = mh.n_mu_vec # muon multiplicity
     
