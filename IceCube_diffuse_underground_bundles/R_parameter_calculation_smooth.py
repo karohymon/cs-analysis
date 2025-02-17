@@ -8,7 +8,7 @@ import pickle
 import numpy as np
 
 import crflux.models as pm
-import mceq_underground_helpers_cs as mh
+import mceq_underground_helpers_cs_smooth as mh
 
 import click
 
@@ -19,7 +19,7 @@ def X(d):
  
     return d/np.cos(np.deg2rad(angles))
 
-def dNmu_dmu(d,month, ptype, cs): # month = str
+def dNmu_dmu(d,month, ptype, cs_p1, cs_p2): # month = str
     '''
     calculate muon flux per multiplicity
 
@@ -52,9 +52,9 @@ def dNmu_dmu(d,month, ptype, cs): # month = str
                                     0.,
                                     pm.GlobalSplineFitBeta(),"yields_" +month,
                                     ptype,
-                                    cs,
+                                    cs_p1, cs_p2,
                                     norm=False
-                                ) / mh.rates(x_mod[i], angle, month, ptype, cs)
+                                ) / mh.rates(x_mod[i], angle, month, ptype, cs_p1, cs_p2)
     return dNmudmu
 
 def R(m,dN_dNmu):
@@ -82,21 +82,18 @@ def R_normalized(m,R_mod,d,ptype):
 
     '''
     # default parameters
-    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs=1.0) #default cs
+    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs_p1=1.0, cs_p2=1.0) #default cs
     R_def_apr = R(m,dNu_dmu_apr)
     
     return R_mod/R_def_apr
 
 
-@click.command()
-@click.option('--smooth_transition', is_flag=True, help="R calculation from bundle flux with smooth modified cross section.")
 
-def main(smooth_transition):
-    if smooth_transition:
-        filename = "/hetghome/khymon/cs-files/R_value_const_pi-air_sibyll23c_smoothtransition.pkl"
-    else:
-        filename = "/hetghome/khymon/cs-files/R_value_const_pi-air_sibyll23c.pkl"
-    
+
+def main():
+  
+    #filename = "/hetghome/khymon/cs-files/R_value_const_pi-air_sibyll23c_smoothtransition.pkl"
+  
 
     m = mh.n_mu_vec # muon multiplicity
     
@@ -105,7 +102,8 @@ def main(smooth_transition):
     results = {}  # Dictionary to store the results
 
     d_values = [1.5, 3.5]# detectpr depth: 1.5 or 3.5km
-    cs_values = [0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
+    cs_p1_values = [0.95,1.00,1.05] #[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
+    cs_p2_values = [1.0]
     ptype_values = [2212] #, 402, 1608, 5626]  # particle types
     season_values = ["jan", "apr", "jul"]  #  seasons
 
@@ -114,19 +112,20 @@ def main(smooth_transition):
         x_mod = X(d) # for specific depth  
 
         
-        for cs in cs_values:
-            for ptype in ptype_values:
-                for season in season_values:
-                    # Call functions to compute R
+        for cs_p1 in cs_p1_values:
+            for cs_p2 in cs_p2_values:
+                for ptype in ptype_values:
+                    for season in season_values:
+                        # Call functions to compute R
 
-                    dNmu_dmu_mod = dNmu_dmu(d,season, ptype , cs)
-                    R_mod = R(m,dNmu_dmu_mod)
-                    R_norm = R_normalized(m,R_mod,d,ptype)
-                        
-                    # Store the result in the dictionary
-                    results[(str(d), str(cs), str(ptype), season)] = R_norm
+                        dNmu_dmu_mod = dNmu_dmu(d,season, ptype , cs_p1, cs_p2)
+                        R_mod = R(m,dNmu_dmu_mod)
+                        R_norm = R_normalized(m,R_mod,d,ptype)
+                            
+                        # Store the result in the dictionary
+                        results[(str(d), str(cs_p1), str(cs_p2), str(ptype), season)] = R_norm
 
-    with open("/hetghome/khymon/cs-files/R_value_const_pi-air_sibyll23c.pkl", "wb") as f:
+    with open("/hetghome/khymon/cs-files/R_value_const_pi-air_sibyll23c_smooth.pkl", "wb") as f:
         pickle.dump(results, f)
 
 
