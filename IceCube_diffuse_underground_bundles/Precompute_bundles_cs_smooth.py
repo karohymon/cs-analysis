@@ -40,7 +40,8 @@ from cs_modifier_with_smooth_transition import ModIntCrossSections
 def main(scale_factor_p1, scale_factor_p2, scale_factor_k1, scale_factor_k2, e0, e1,increase,interactionmodel,nucleus):
 
 
-    scale_factor_p1 = float(f'{scale_factor_p1}')
+    scale_factor_p1 = float(f"{float(scale_factor_p1):2f}")
+
     scale_factor_p2 = float(f'{scale_factor_p2}')
     scale_factor_k1 = float(f'{scale_factor_k1}')
     scale_factor_k2 = float(f'{scale_factor_k2}')
