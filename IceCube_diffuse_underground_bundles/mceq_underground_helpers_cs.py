@@ -24,13 +24,13 @@ cs_dir = pathlib.Path("/hetghome/khymon/cs-files")  # Cross-section tuned files
 # Generate flux file paths dynamically
 flux_files = {
     (ptype, round(cs, 1)): cs_dir / f"surface_fluxes_season{ptype}_pi{cs:.1f}_k1.0_10000.0const.pkl"
-    for ptype in [2212, 402, 1608, 5626]  # Proton, Iron
+    for ptype in [2212, 5626]  # Proton, Iron 402, 1608,
     for cs in np.round(np.arange(0.5, 1.6, 0.1), 1)  # Ensure precise values
 }
 
 muspec_files = {
     (ptype, round(cs, 1)): cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs:.1f}_k1.0_10000.0const.pkl"
-    for ptype in [2212, 402, 5626]
+    for ptype in [2212, 5626]
     for cs in np.round(np.arange(0.5, 1.6, 0.1), 1)  # Fix floating-point precision
 }
 

@@ -10,7 +10,7 @@ import numpy as np
 import crflux.models as pm
 import mceq_underground_helpers_cs as mh
 
-import click
+
 
 def X(d):
     ''' calculate slant depth ad a given vertical depth in km'''
@@ -87,17 +87,8 @@ def R_normalized(m,R_mod,d,ptype):
     
     return R_mod/R_def_apr
 
-
-@click.command()
-@click.option('--smooth_transition', is_flag=True, help="R calculation from bundle flux with smooth modified cross section.")
-
 def main(smooth_transition):
-    if smooth_transition:
-        filename = "/hetghome/khymon/cs-files/R_value_const_pi-air_sibyll23c_smoothtransition.pkl"
-    else:
-        filename = "/hetghome/khymon/cs-files/R_value_const_pi-air_sibyll23c.pkl"
-    
-
+   
     m = mh.n_mu_vec # muon multiplicity
     
 
