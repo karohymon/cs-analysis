@@ -138,16 +138,19 @@ def main(scale_factor_p1, scale_factor_p2, scale_factor_k1, scale_factor_k2, e0,
     # adapt file names
     pickle.dump(
         [mceq_air.e_grid, cos_thetas, cr_grid, ground_muspec_prim_energies[0], ground_muspec_prim_energies[1], ground_muspec_prim_energies[2]],
-        open("/hetghome/khymon/cs-files/smooth-transition/ground_muspec_prim_energies_season_cstune" + str(nucleus) + "_pi" + str(scale_factor_p1) + 
-             "_" + str(scale_factor_p2) + "_k" + str(scale_factor_k1) +  
-             "_" + str(scale_factor_k2)+ "_e0" + str(e0)+ "_e1" + str(e1) + str(increase)+ ".pkl", "wb"),
+        open(f"/hetghome/khymon/cs-files/smooth-transition/ground_muspec_prim_energies_season_cstune{nucleus}"
+            f"_pi{float(scale_factor_p1):.2f}_{float(scale_factor_p2):.2f}"
+            f"_k{float(scale_factor_k1):.2f}_{float(scale_factor_k2):.2f}"
+            f"_e0{float(e0):.1f}_e1{float(e1):.1f}{increase}.pkl", "wb"),
     )
     pickle.dump(
-        [mceq_air.e_grid, cos_thetas, surface_flux_GSF[0], surface_flux_GSF[1] , surface_flux_GSF[2]],
-        open("/hetghome/khymon/cs-files/smooth-transition/surface_fluxes_season" + str(nucleus) + "_pi" + str(scale_factor_p1) + 
-             "_" + str(scale_factor_p2) + "_k" + str(scale_factor_k1) +  
-             "_" + str(scale_factor_k2)+ "_e0" + str(e0)+ "_e1" + str(e1) + str(increase)+  ".pkl", "wb"),
+        [mceq_air.e_grid, cos_thetas, surface_flux_GSF[0], surface_flux_GSF[1], surface_flux_GSF[2]],
+        open(f"/hetghome/khymon/cs-files/smooth-transition/surface_fluxes_season{nucleus}"
+            f"_pi{float(scale_factor_p1):.2f}_{float(scale_factor_p2):.2f}"
+            f"_k{float(scale_factor_k1):.2f}_{float(scale_factor_k2):.2f}"
+            f"_e0{float(e0):.1f}_e1{float(e1):.1f}{increase}.pkl", "wb"),
     )
+
 
     
 if __name__ == '__main__':
