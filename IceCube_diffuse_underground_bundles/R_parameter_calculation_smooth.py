@@ -88,24 +88,51 @@ def R_normalized(m,R_mod,d,ptype):
     return R_mod/R_def_apr
 
 
+@click.command()
+@click.option('--calculation','-c', help='k-pi, threshold, general')
 
-
-def main():
+def main(calculation):
+    '''
+        k-pi: only iterate between k2 and p2
+        threshold: change only e0
+        general: detailed change of p1 and p2 in different combinations
+    '''
   
-    #filename = "/hetghome/khymon/cs-files/R_value_const_pi-air_sibyll23c_smoothtransition.pkl"
-  
+    calc_tag = f'{calculation}'  
 
     m = mh.n_mu_vec # muon multiplicity
-    
+
+    if calc_tag == 'general':
+        
+        cs_p1_values = [1.0] #[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
+        cs_p2_values = [0.9,1.0,1.1]
+        cs_k2_values = [0.9,1.0,1.1]
+        ptype_values = [2212] #, 402, 1608, 5626]  # particle types
+        season_values = ["jan", "apr", "jul"]  #  seasons
+        e0_values = [1e3]
+
+    elif calc_tag == 'k-pi':
+        
+        cs_p1_values = [1.0] 
+        cs_p2_values = [0.9,1.0,1.1]
+        cs_k2_values = [0.9,1.0,1.1]
+        ptype_values = [2212] 
+        season_values = ["apr"]  #  seasons
+        e0_values = [1e3]
+
+    elif calc_tag == 'threshold':
+        
+        cs_p1_values = [1.05] #[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
+        cs_p2_values = [1.1]
+        cs_k2_values = [1.0]
+        ptype_values = [2212] 
+        season_values = ["apr"]  #  seasons
+        e0_values = [300,700,1e3,3000,7000]
+        
 
     #dictionary
     results = {}  # Dictionary to store the results
-
     d_values = [1.5, 3.5]# detectpr depth: 1.5 or 3.5km
-    cs_p1_values = [0.95,1.00,1.05] #[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
-    cs_p2_values = [1.0]
-    ptype_values = [2212] #, 402, 1608, 5626]  # particle types
-    season_values = ["jan", "apr", "jul"]  #  seasons
 
     for d in d_values:  
        
@@ -114,18 +141,20 @@ def main():
         
         for cs_p1 in cs_p1_values:
             for cs_p2 in cs_p2_values:
-                for ptype in ptype_values:
-                    for season in season_values:
-                        # Call functions to compute R
+                for cs_k2 in cs_k2_values:
+                    for ptype in ptype_values:
+                        for season in season_values:
+                            for e0 in e0_values:
+                                # Call functions to compute R
 
-                        dNmu_dmu_mod = dNmu_dmu(d,season, ptype , cs_p1, cs_p2)
-                        R_mod = R(m,dNmu_dmu_mod)
-                        R_norm = R_normalized(m,R_mod,d,ptype)
-                            
-                        # Store the result in the dictionary
-                        results[(str(d), str(cs_p1), str(cs_p2), str(ptype), season)] = R_norm
+                                dNmu_dmu_mod = dNmu_dmu(d,season, ptype , cs_p1, cs_p2,cs_k2)
+                                R_mod = R(m,dNmu_dmu_mod)
+                                R_norm = R_normalized(m,R_mod,d,ptype)
+                                    
+                                # Store the result in the dictionary
+                                results[(str(d), str(cs_p1), str(cs_p2), str(ptype), season, str(e0))] = R_norm
 
-    with open("/hetghome/khymon/cs-files/R_value_const_pi-air_sibyll23c_smooth.pkl", "wb") as f:
+    with open("/hetghome/khymon/cs-files/R_value_const_pi-air_k-air_sibyll23c_smooth_" + str(calc_tag) + ".pkl", "wb") as f:
         pickle.dump(results, f)
 
 
