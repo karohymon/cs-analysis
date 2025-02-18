@@ -76,8 +76,7 @@ def R(m,dN_dNmu,lower_lim,upper_lim):
     int_low = np.zeros(len(dN_dNmu[:,0]))
     int_high = np.zeros(len(dN_dNmu[:,0]))
     for i in range(len(dN_dNmu[:,0])):
-        print(np.shape((dN_dNmu[i,1:lower_lim])))
-        print(np.shape((m[1:lower_lim])))
+        
         int_low[i] = np.trapezoid(dN_dNmu[i,1:lower_lim],m[1:lower_lim]) # 19 before
         int_high[i] = np.trapezoid(dN_dNmu[i,upper_lim:],m[upper_lim:])    #59 before
 
@@ -128,20 +127,21 @@ def main():
                             for ll in lower_lim_values:
                                 for ul in upper_lim_values:
                                     # Call functions to compute R
-                                    print(ll, ul)
+                                    
                                     dNmu_dmu_mod = dNmu_dmu(d,season, ptype , cs_p1, cs_p2, cs_k2)
                                     R_mod = R(m,dNmu_dmu_mod, ll, ul)
                                     R_norm = R_normalized(m,R_mod,d,ptype, ll, ul)
                                         
                                     # Store the result in the dictionary
-                                    results[(str(d), str(ll), str(ul), str(cs_p1), str(cs_p2), str(cs_k2), str(ptype), season)] = R_norm
+                                    results[(str(d), str(ll), str(ul), str(cs_p1), str(cs_p2), str(cs_k2), str(ptype), season)] = R_norm.tolist()
 
     with open("/hetghome/khymon/cs-files/R_value_const_pi-air_sibyll23c_smooth_R_integration_optimizatoin.pkl", "wb") as f:
         pickle.dump(results, f)
 
     # Find the key with the maximum R_norm
-    max_key = max(results, key=results.get)  # Get the key with the highest R_norm
-    max_R = results[max_key]  # Get the corresponding max value
+    max_key = max(results, key=lambda k: np.max(results[k]))  # Find the key with the highest R_norm value
+    max_R = np.max(results[max_key])  # Get the corresponding max value
+
 
     print("Maximum R_norm:", max_R)
     print("Corresponding parameters:", max_key)
