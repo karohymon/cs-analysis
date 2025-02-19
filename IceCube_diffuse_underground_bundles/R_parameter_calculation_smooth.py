@@ -19,7 +19,7 @@ def X(d):
  
     return d/np.cos(np.deg2rad(angles))
 
-def dNmu_dmu(d,month, ptype, cs_p1, cs_p2): # month = str
+def dNmu_dmu(d,month, ptype, cs_p1, cs_p2,cs_k2): # month = str
     '''
     calculate muon flux per multiplicity
 
@@ -52,9 +52,9 @@ def dNmu_dmu(d,month, ptype, cs_p1, cs_p2): # month = str
                                     0.,
                                     pm.GlobalSplineFitBeta(),"yields_" +month,
                                     ptype,
-                                    cs_p1, cs_p2,
+                                    cs_p1, cs_p2, cs_k2,
                                     norm=False
-                                ) / mh.rates(x_mod[i], angle, month, ptype, cs_p1, cs_p2)
+                                ) / mh.rates(x_mod[i], angle, month, ptype, cs_p1, cs_p2,cs_k2)
     return dNmudmu
 
 def R(m,dN_dNmu):
@@ -82,7 +82,7 @@ def R_normalized(m,R_mod,d,ptype):
 
     '''
     # default parameters
-    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs_p1=1.0, cs_p2=1.0) #default cs
+    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs_p1=1.0, cs_p2=1.0,cs_k2=1.0) #default cs
     R_def_apr = R(m,dNu_dmu_apr)
     
     return R_mod/R_def_apr
@@ -127,7 +127,7 @@ def main(calculation):
         cs_k2_values = [1.0]
         ptype_values = [2212] 
         season_values = ["apr"]  #  seasons
-        e0_values = [300,700,1e3,3000,7000]
+        e0_values = [300,700,1e3,3000,6000]
         
 
     #dictionary
@@ -152,7 +152,7 @@ def main(calculation):
                                 R_norm = R_normalized(m,R_mod,d,ptype)
                                     
                                 # Store the result in the dictionary
-                                results[(str(d), str(cs_p1), str(cs_p2), str(ptype), season, str(e0))] = R_norm
+                                results[(str(d), str(cs_p1), str(cs_p2), str(cs_k2), str(ptype), season, str(e0))] = R_norm
 
     with open("/hetghome/khymon/cs-files/R_value_const_pi-air_k-air_sibyll23c_smooth_" + str(calc_tag) + ".pkl", "wb") as f:
         pickle.dump(results, f)

@@ -25,20 +25,20 @@ cs_dir = pathlib.Path("/hetghome/khymon/cs-files/smooth-transition")  # Cross-se
 flux_files = {
     (ptype, round(cs_p1,2), round(cs_p2, 1), round(cs_k2, 1)): cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p1:.2f}_{cs_p2:.2f}_k1.00_{cs_k2:.2f}_e0{e0:.1f}_e1{e1:.1f}const.pkl"
     for ptype in [2212]#, 402, 5626]
-    for cs_p1 in [1.00]#[0.95,1.00,1.05]#np.round(np.arange(0.95, 1.06, 0.05), 1)#np.round(np.arange(0.95, 1.06, 0.05), 1)  # Ensure precise values
-    for cs_p2 in [1.1,1.0,0.9]#np.round(np.arange(0.90, 1.1, 0.5), 1)#np.round(np.arange(0.5, 1.6, 0.1), 1) 
-    for cs_k2 in [0.9, 1.0, 1.1]
-    for e0 in [1.e3]
+    for cs_p1 in [1.05]#[0.95,1.00,1.05]#np.round(np.arange(0.95, 1.06, 0.05), 1)#np.round(np.arange(0.95, 1.06, 0.05), 1)  # Ensure precise values
+    for cs_p2 in [1.1,1.0]#np.round(np.arange(0.90, 1.1, 0.5), 1)#np.round(np.arange(0.5, 1.6, 0.1), 1) 
+    for cs_k2 in [1.0]
+    for e0 in [300., 700., 1.e3, 3000., 6000.]
     for e1 in [1.e4]
 }
 
 muspec_files = {
     (ptype, round(cs_p1,2), round(cs_p2, 1), round(cs_k2, 1)): cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p1:.2f}_{cs_p2:.2f}_k1.00_{cs_k2:.2f}_e0{e0:.1f}_e1{e1:.1f}const.pkl"
     for ptype in [2212]#, 402, 5626]
-    for cs_p1 in [1.00]#[0.95,1.00,1.05]#np.round(np.arange(0.95, 1.06, 0.05), 1)#np.round(np.arange(0.95, 1.06, 0.05), 1)  # Ensure precise values
-    for cs_p2 in [1.1,1.0,0.9]#[0.9,1.0,1.1]#np.round(np.arange(0.90, 1.1, 0.5), 1)#np.round(np.arange(0.5, 1.6, 0.1), 1) 
-    for cs_k2 in [0.9, 1.0, 1.1]
-    for e0 in [1.e3]
+    for cs_p1 in [1.05]#[0.95,1.00,1.05]#np.round(np.arange(0.95, 1.06, 0.05), 1)#np.round(np.arange(0.95, 1.06, 0.05), 1)  # Ensure precise values
+    for cs_p2 in [1.1]#[0.9,1.0,1.1]#np.round(np.arange(0.90, 1.1, 0.5), 1)#np.round(np.arange(0.5, 1.6, 0.1), 1) 
+    for cs_k2 in [1.0]
+    for e0 in [300., 700., 1.e3, 3000., 6000.]
     for e1 in [1.e4]
     # k is kept constant for now
 }
