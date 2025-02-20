@@ -122,8 +122,8 @@ def main(calculation):
 
     elif calc_tag == 'threshold':
         
-        cs_p1_values = [1.05] #[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
-        cs_p2_values = [1.1]
+        cs_p1_values = [1.05,1.0] #[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
+        cs_p2_values = [1.1,1.0]
         cs_k2_values = [1.0]
         ptype_values = [2212] 
         season_values = ["apr"]  #  seasons
@@ -147,7 +147,7 @@ def main(calculation):
                             for e0 in e0_values:
                                 # Call functions to compute R
 
-                                dNmu_dmu_mod = dNmu_dmu(d,season, ptype , cs_p1, cs_p2,cs_k2)
+                                dNmu_dmu_mod = dNmu_dmu(d,season, ptype , cs_p1, cs_p2,cs_k2,e0)
                                 R_mod = R(m,dNmu_dmu_mod)
                                 R_norm = R_normalized(m,R_mod,d,ptype)
                                     
