@@ -26,29 +26,31 @@ cos_thetas = None
 
 # Define base directory as a function to call
 
-def initialize_flux_dicts(ptype_values, cs_p1_values, cs_p2_values, cs_k2_values, e0_values, e1_values):
+def initialize_flux_dicts(ptype_values, cs_p1_values, cs_p2_values, cs_k1_values, cs_k2_values, e0_values, e1_values):
     global flux_files, muspec_files, intp_surface_fluxes, intp_ground_mu_yields, surface_fluxes, ground_muspec_energies, cos_thetas,  angles, c_wi
 
     base_dir = pathlib.Path(__file__).parent
     cs_dir = pathlib.Path("/hetghome/khymon/cs-files/smooth-transition")  # Cross-section tuned files
 
     flux_files = {
-        (ptype, round(cs_p1, 2), round(cs_p2, 1), round(cs_k2, 1), round(e0, 1)): 
-        cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p1:.2f}_{cs_p2:.2f}_k1.00_{cs_k2:.2f}_e0{e0:.1f}_e1{e1:.1f}const.pkl"
+        (ptype, round(cs_p1, 2), round(cs_p2, 1), round(cs_k1, 1), round(cs_k2, 1), round(e0, 1)): 
+        cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p1:.2f}_{cs_p2:.2f}_k{cs_k1:.2f}_{cs_k2:.2f}_e0{e0:.1f}_e1{e1:.1f}const.pkl"
         for ptype in ptype_values
         for cs_p1 in cs_p1_values
         for cs_p2 in cs_p2_values
+        for cs_k1 in cs_k1_values
         for cs_k2 in cs_k2_values
         for e0 in e0_values
         for e1 in e1_values
     }
 
     muspec_files = {
-        (ptype, round(cs_p1,2), round(cs_p2, 1), round(cs_k2, 1), round(e0, 1)): 
-        cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p1:.2f}_{cs_p2:.2f}_k1.00_{cs_k2:.2f}_e0{e0:.1f}_e1{e1:.1f}const.pkl"
+        (ptype, round(cs_p1,2), round(cs_p2, 1), round(cs_k1, 1), round(cs_k2, 1), round(e0, 1)): 
+        cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p1:.2f}_{cs_p2:.2f}_k{cs_k1:.2f}_{cs_k2:.2f}_e0{e0:.1f}_e1{e1:.1f}const.pkl"
         for ptype in ptype_values
         for cs_p1 in cs_p1_values
         for cs_p2 in cs_p2_values
+        for cs_k1 in cs_k1_values
         for cs_k2 in cs_k2_values
         for e0 in e0_values
         for e1 in e1_values
@@ -195,7 +197,7 @@ def get_bins_and_width_from_centers(vector):
 
 ## modified code ----------------------------------------------------------------- #
 
-def _flux(angle, flux_label, ptype=2212, cs_p1=1.0, cs_p2 = 1.0, cs_k2= 1.0, e0 =1000.0, iecr=None): # added new arguments: ptype and cs
+def _flux(angle, flux_label, ptype=2212, cs_p1=1.0, cs_p2 = 1.0, cs_k1=1.0, cs_k2= 1.0, e0 =1000.0, iecr=None): # added new arguments: ptype and cs
     """
     Calculate the flux.
 
@@ -213,7 +215,7 @@ def _flux(angle, flux_label, ptype=2212, cs_p1=1.0, cs_p2 = 1.0, cs_k2= 1.0, e0 
     cth = np.cos(np.radians(angle))
     assert np.min(cth) >= cos_thetas[0] and np.max(cth) <= cos_thetas[-1]
 
-    key = (ptype, cs_p1, cs_p2, cs_k2, e0)
+    key = (ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0)
         
     if flux_label == "daemonflux":
         return mute_energies**-3 * Flux.flux(mute_energies, angle, quantity="muflux")
@@ -223,22 +225,22 @@ def _flux(angle, flux_label, ptype=2212, cs_p1=1.0, cs_p2 = 1.0, cs_k2= 1.0, e0 
         return intp_ground_mu_yields[key][flux_label][iecr](cth)[:dim_ug]
     elif flux_label == "yields_jan":
         assert iecr is not None
-        return intp_ground_mu_yields[(ptype, cs_p1, cs_p2, cs_k2, e0)]["jan"][iecr](cth)[:dim_ug]
+        return intp_ground_mu_yields[(ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0)]["jan"][iecr](cth)[:dim_ug]
     elif flux_label == "yields_apr":
         assert iecr is not None
-        return intp_ground_mu_yields[(ptype, cs_p1, cs_p2, cs_k2, e0)]["apr"][iecr](cth)[:dim_ug]
+        return intp_ground_mu_yields[(ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0)]["apr"][iecr](cth)[:dim_ug]
     elif flux_label == "yields_jul":
         assert iecr is not None
-        return intp_ground_mu_yields[(ptype, cs_p1, cs_p2, cs_k2, e0)]["jul"][iecr](cth)[:dim_ug]
+        return intp_ground_mu_yields[(ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0)]["jul"][iecr](cth)[:dim_ug]
 
-    raise ValueError(f"Unknown flux label '{flux_label}' for ptype={ptype}, cs_p1='{cs_p1}', cs_p2 ='{cs_p2}', cs_k2='{cs_k2}', e0='{e0}'")
+    raise ValueError(f"Unknown flux label '{flux_label}' for ptype={ptype}, cs_p1='{cs_p1}', cs_p2 ='{cs_p2}', cs_k1='{cs_k1}', cs_k2='{cs_k2}', e0='{e0}'")
     
 
 
 ## old code ----------------------------------------------------------------- #
 
 
-def flux(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr):
+def flux(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr):
     """
     Calculate the flux.
 
@@ -252,11 +254,11 @@ def flux(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr):
     """
     if np.isscalar(depth):
         if depth <= 0.0:
-            return _flux(angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr)
+            return _flux(angle, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr)
         else:
             assert np.min(depth) >= slant_depths[0] and np.max(depth) < slant_depths[-1]
         # depth = np.array([depth])
-        fl = _flux(angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr)
+        fl = _flux(angle, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr)
         idx = np.argmax(slant_depths > depth)
         frange = (
             utensor[idx - 1 : idx + 1].dot(np.nan_to_num(fl * _e_widths)) / _e_widths
@@ -273,7 +275,7 @@ def flux(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr):
                 )
             )
     else:
-        fl = _flux(angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr)
+        fl = _flux(angle, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr)
         frange = utensor.dot(np.nan_to_num(fl * _e_widths)) / _e_widths
         with np.errstate(all="ignore"):
             return np.nan_to_num(
@@ -288,7 +290,7 @@ def flux(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr):
             )
 
 
-def integrated_flux(X, flux_label, ptype,cs_p1, cs_p2, cs_k2,e0, iecr=None):
+def integrated_flux(X, flux_label, ptype,cs_p1, cs_p2, cs_k1, cs_k2,e0, iecr=None):
     """
     Get the integrated flux.
 
@@ -303,13 +305,13 @@ def integrated_flux(X, flux_label, ptype,cs_p1, cs_p2, cs_k2,e0, iecr=None):
     for icth, cth in enumerate(cos_thetas):
         if X / cth > _X_MAX:
             continue
-        fl = flux(X / cth, angles[icth], flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr) * c_wi[0]
+        fl = flux(X / cth, angles[icth], flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr) * c_wi[0]
 
         integrated_flux += fl  # if fl > 0 else 0.0
     return integrated_flux
 
 
-def rates(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr=None):
+def rates(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr=None):
     """
     Calculate the rates.
 
@@ -321,13 +323,13 @@ def rates(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr=None):
     Returns:
         numpy.ndarray: Underground rates.
     """
-    ufluxes = flux(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr)
+    ufluxes = flux(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr)
 
     rates = np.trapz(np.atleast_2d(ufluxes), mute_energies, axis=1)
     return rates
 
 
-def integrated_rates(depth, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr=None):
+def integrated_rates(depth, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr=None):
     """
     Get the integrated rates.
 
@@ -338,12 +340,12 @@ def integrated_rates(depth, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr=Non
         float: Integrated rates.
     """
     return np.trapz(
-        [rates(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr=None) for angle in angles],
+        [rates(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr=None) for angle in angles],
         cos_thetas,
     )
 
 
-def mean_e(depth, angle, iecr, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, flcutoff=1e-15):
+def mean_e(depth, angle, iecr, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, flcutoff=1e-15):
     """
     Calculate the mean energy.
 
@@ -355,7 +357,7 @@ def mean_e(depth, angle, iecr, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, flcut
     Returns:
         float: Mean energy.
     """
-    fl = flux(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr)
+    fl = flux(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr)
     fl[fl <= 0.0] *= 0
     fl = np.nan_to_num(fl)
     assert np.sum(fl) > 0.0, "Flux is zero everywhere"
@@ -365,7 +367,7 @@ def mean_e(depth, angle, iecr, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, flcut
     return np.trapz((mute_energies * fl), mute_energies) / flint
 
 
-def integrated_mean_e(depth, ptype, cs_p1, cs_p2, cs_k2, e0, iecr, flcutoff=1e-15):
+def integrated_mean_e(depth, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr, flcutoff=1e-15):
     """
     Calculate the mean energy.
 
@@ -377,7 +379,7 @@ def integrated_mean_e(depth, ptype, cs_p1, cs_p2, cs_k2, e0, iecr, flcutoff=1e-1
     Returns:
         float: Mean energy.
     """
-    fl = integrated_flux(depth, "yields", ptype, cs_p1, cs_p2, cs_k2, e0, iecr=None)
+    fl = integrated_flux(depth, "yields", ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr=None)
     fl[fl <= 0.0] *= 0
     fl = np.nan_to_num(fl)
     assert np.sum(fl) > 0.0, "Flux is zero everywhere"
@@ -387,7 +389,7 @@ def integrated_mean_e(depth, ptype, cs_p1, cs_p2, cs_k2, e0, iecr, flcutoff=1e-1
     return np.trapz((mute_energies * fl), mute_energies) / flint
 
 
-def mean_mult(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr=None):
+def mean_mult(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr=None):
     """
     Calculate the mean multiplicity.
 
@@ -398,12 +400,12 @@ def mean_mult(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr=Non
         float: Mean multiplicity.
     """
     return np.trapz(
-        flux(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr),
+        flux(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr),
         mute_energies,
     )
 
 
-def mean_bundle_energy(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr=None):
+def mean_bundle_energy(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr=None):
     """
     Calculate the mean multiplicity.
 
@@ -414,12 +416,12 @@ def mean_bundle_energy(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0,
         float: Mean multiplicity.
     """
     return np.trapz(
-        mute_energies * flux(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr),
+        mute_energies * flux(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr),
         mute_energies,
     )
 
 
-def integrated_mean_mult(depth, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr=None):
+def integrated_mean_mult(depth, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr=None):
     """
     Calculate the mean multiplicity.
 
@@ -430,15 +432,15 @@ def integrated_mean_mult(depth, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr
         float: Mean multiplicity.
     """
     return np.trapz(
-        integrated_flux(depth, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, iecr),
+        integrated_flux(depth, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, iecr),
         mute_energies,
     )
 
 
-def mult_dist(depth, angle, pmodel, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, norm=True):
+def mult_dist(depth, angle, pmodel, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, norm=True):
     # Unweighted multiplicity vector for all CR energies at specific depth
     mult_vec = np.array(
-        [mean_mult(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, ei) for ei, e_cr in enumerate(cr_grid)] #needs yields
+        [mean_mult(depth, angle, flux_label, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, ei) for ei, e_cr in enumerate(cr_grid)] #needs yields
     )
     # Truncate to only include energies with multiplicity > 1e-2
     cr_grid_tr = cr_grid[mult_vec > 1e-1]
@@ -469,11 +471,11 @@ def mult_dist(depth, angle, pmodel, flux_label, ptype, cs_p1, cs_p2, cs_k2, e0, 
     return n_mu_spec / n_mu_spec[0] if norm is True else n_mu_spec
 
 
-def bundle_energy_dist(depth, angle, pmodel, ptype, cs_p1, cs_p2, cs_k2, e0, norm=True):
+def bundle_energy_dist(depth, angle, pmodel, ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, norm=True):
     # Unweighted multiplicity vector for all CR energies at specific depth
     be_vec = np.array(
         [
-            mean_bundle_energy(depth, angle, "yields", ptype, cs_p1, cs_p2, cs_k2, e0, ei)
+            mean_bundle_energy(depth, angle, "yields", ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0, ei)
             for ei, e_cr in enumerate(cr_grid)
         ]
     )
