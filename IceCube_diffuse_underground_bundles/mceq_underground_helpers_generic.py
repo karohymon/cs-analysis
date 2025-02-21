@@ -33,7 +33,7 @@ def initialize_flux_dicts(ptype_values, cs_p1_values, cs_p2_values, cs_k1_values
     cs_dir = pathlib.Path("/hetghome/khymon/cs-files/smooth-transition")  # Cross-section tuned files
 
     flux_files = {
-        (ptype, round(cs_p1, 2), round(cs_p2, 1), round(cs_k1, 1), round(cs_k2, 1), round(e0, 1)): 
+        (ptype, round(cs_p1, 2), round(cs_p2, 1), round(cs_k1, 2), round(cs_k2, 1), round(e0, 1)): 
         cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p1:.2f}_{cs_p2:.2f}_k{cs_k1:.2f}_{cs_k2:.2f}_e0{e0:.1f}_e1{e1:.1f}const.pkl"
         for ptype in ptype_values
         for cs_p1 in cs_p1_values
@@ -45,7 +45,7 @@ def initialize_flux_dicts(ptype_values, cs_p1_values, cs_p2_values, cs_k1_values
     }
 
     muspec_files = {
-        (ptype, round(cs_p1,2), round(cs_p2, 1), round(cs_k1, 1), round(cs_k2, 1), round(e0, 1)): 
+        (ptype, round(cs_p1,2), round(cs_p2, 1), round(cs_k1, 2), round(cs_k2, 1), round(e0, 1)): 
         cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p1:.2f}_{cs_p2:.2f}_k{cs_k1:.2f}_{cs_k2:.2f}_e0{e0:.1f}_e1{e1:.1f}const.pkl"
         for ptype in ptype_values
         for cs_p1 in cs_p1_values
@@ -216,7 +216,7 @@ def _flux(angle, flux_label, ptype=2212, cs_p1=1.0, cs_p2 = 1.0, cs_k1=1.0, cs_k
     assert np.min(cth) >= cos_thetas[0] and np.max(cth) <= cos_thetas[-1]
 
     key = (ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0)
-        
+
     if flux_label == "daemonflux":
         return mute_energies**-3 * Flux.flux(mute_energies, angle, quantity="muflux")
     elif flux_label in intp_surface_fluxes.get(key, {}):
