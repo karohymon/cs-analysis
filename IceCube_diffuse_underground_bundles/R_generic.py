@@ -117,7 +117,7 @@ def main(calculation):
         
         cs_p1_values = [1.0] 
         cs_p2_values = [0.9,1.0,1.1]
-        cs_k1_values = [1.0,]
+        cs_k1_values = [1.0]
         cs_k2_values = [0.9,1.0,1.1]
         ptype_values = [2212] 
         season_values = ["apr"]  #  seasons
@@ -132,7 +132,7 @@ def main(calculation):
         cs_k2_values = [0.9,1.0,1.1]
         ptype_values = [2212] 
         season_values =  ["jan", "apr", "jul"]   #  seasons
-        e0_values = [1e3]
+        e0_values = [1.e3]
         e1_values = [10000]
 
     elif calc_tag == 'threshold':
@@ -145,6 +145,17 @@ def main(calculation):
         season_values = ["jan", "apr", "jul"]  #  seasons
         e0_values = [300.0,700.0,1.e3,3000.0,6000.0]
         e1_values = [10000]
+
+    elif calc_tag == 'threshold_syst':
+        
+        cs_p1_values = [1.01,1.0,0.99] #[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
+        cs_p2_values = [1.01,1.0,0.99]
+        cs_k1_values = [1.0]
+        cs_k2_values = [1.0]
+        ptype_values = [2212] 
+        season_values = ["jan", "apr", "jul"]  #  seasons
+        e0_values = [100.0,400.0, 700, 1.e3,4000.0,7000.0]
+        e1_values = [10000., 40000., 70000.]
 
     # initlialize helper   
     mh.initialize_flux_dicts(
