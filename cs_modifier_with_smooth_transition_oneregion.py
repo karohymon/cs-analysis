@@ -28,9 +28,10 @@ class ModIntCrossSections(InteractionCrossSections):
             e0 = self.e0
         
         # Energy ranges
-        e_range1 = (self.energy_grid.c > e0)
+        e0 = 10. ** e0 # convert log number to float
+        e_range1 = (self.energy_grid.c >= e0)
         
-        print(f"Applying mod: region1 (>{e0}) with {scale_factor_region1}")
+        print(f"Applying mod: region1 (>={e0}) with {scale_factor_region1}")
 
         # Apply scaling factors first for the energy range before e1 (excluding idx_at_e1)
         #if self.increase == 'exp':
@@ -49,6 +50,7 @@ class ModIntCrossSections(InteractionCrossSections):
         
         # The index at e1 will be the first position where the energy is greater than or equal to e1
         energy_at_e0 = self.energy_grid.c[idx_at_e0] if idx_at_e0 < len(self.energy_grid.c) else None
+        print('e0 = ',energy_at_e0)
         
         # Ensure e1 is within the energy grid
         if energy_at_e0 is None or energy_at_e0 > self.energy_grid.c[-1]:
