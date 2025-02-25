@@ -82,7 +82,7 @@ def R_normalized(m,R_mod,d,ptype):
 
     '''
     # default parameters
-    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs_p=1.0, cs_k=1.0, e0=1000.0) #default cs
+    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs_p=1.0, cs_k=1.0, e0=4.05) #default cs
     R_def_apr = R(m,dNu_dmu_apr)
     
     return R_mod/R_def_apr
@@ -119,7 +119,7 @@ def main(calculation):
         cs_k_values = [1.0]
         ptype_values = [2212] 
         season_values = ["jan", "apr", "jul"]  #  seasons
-        e0_values = [300.0,700.0,1.e3,4.e3,7.e3,1.e4,4.e4,7.e4,1.e5]
+        e0_values = [2.05,2.15,2.25,2.35,2.45,2.55,2.65,2.75,2.85,2.95,3.05,3.15,3.25,3.35,3.45,3.55,3.65,3.75,3.85,3.95,4.05,4.15,4.25,4.35,4.45,4.55,4.65,4.75,4.85,4.95]
        
 
     

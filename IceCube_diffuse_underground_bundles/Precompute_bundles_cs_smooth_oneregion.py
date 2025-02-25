@@ -135,14 +135,14 @@ def main(scale_factor_p, scale_factor_k, e0,increase,interactionmodel,nucleus):
         open(f"/hetghome/khymon/cs-files/smooth-transition/ground_muspec_prim_energies_season_cstune{nucleus}"
             f"_pi{float(scale_factor_p):.2f}"
             f"_k{float(scale_factor_k):.2f}"
-            f"_e0{float(e0):.1f}_{increase}.pkl", "wb"),
+            f"_e0{float(e0):.2f}_{increase}.pkl", "wb"),
     )
     pickle.dump(
         [mceq_air.e_grid, cos_thetas, surface_flux_GSF[0], surface_flux_GSF[1], surface_flux_GSF[2]],
         open(f"/hetghome/khymon/cs-files/smooth-transition/surface_fluxes_season{nucleus}"
             f"_pi{float(scale_factor_p):.2f}"
             f"_k{float(scale_factor_k):.2f}"
-            f"_e0{float(e0):.1f}_{increase}.pkl", "wb"),
+            f"_e0{float(e0):.2f}_{increase}.pkl", "wb"),
     )
 
 
