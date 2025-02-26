@@ -115,8 +115,8 @@ def main(calculation):
 
     elif calc_tag == 'threshold':
         
-        cs_p_values = [0.99,1.0,1.01] #[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
-        cs_k_values = [1.0]
+        cs_p_values = [0.99,1.00,1.01] #[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
+        cs_k_values = [1.00]
         ptype_values = [2212] 
         season_values = ["jan", "apr", "jul"]  #  seasons
         e0_values = [2.05,2.15,2.25,2.35,2.45,2.55,2.65,2.75,2.85,2.95,3.05,3.15,3.25,3.35,3.45,3.55,3.65,3.75,3.85,3.95,4.05,4.15,4.25,4.35,4.45,4.55,4.65,4.75,4.85,4.95]
@@ -155,7 +155,7 @@ def main(calculation):
                             # Store the result in the dictionary
                             results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0))] = R_norm
 
-    with open("/hetghome/khymon/cs-files/R_value_const_pi-air_k-air_sibyll23c_smooth_oneregion" + str(calc_tag) + ".pkl", "wb") as f:
+    with open("/hetghome/khymon/cs-files/R_value_const_pi-air_k-air_sibyll23c_smooth_oneregion_" + str(calc_tag) + ".pkl", "wb") as f:
         pickle.dump(results, f)
 
 
