@@ -211,6 +211,7 @@ def _flux(angle, flux_label, ptype=2212, cs_p=1.0, cs_k=1.0, e0 =1000.0, iecr=No
 
     key = (ptype, cs_p, cs_k, e0)
     
+    
     if flux_label == "daemonflux":
         return mute_energies**-3 * Flux.flux(mute_energies, angle, quantity="muflux")
     elif flux_label in intp_surface_fluxes.get(key, {}):
