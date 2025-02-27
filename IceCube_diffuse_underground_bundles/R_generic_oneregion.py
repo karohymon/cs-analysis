@@ -82,7 +82,19 @@ def R_normalized(m,R_mod,d,ptype):
 
     '''
     # default parameters
-    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs_p=1.0, cs_k=1.0, e0=4.05) #default cs
+    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs_p=1.0, cs_k=1.0, e0=3.65) #default cs
+    R_def_apr = R(m,dNu_dmu_apr)
+    
+    return R_mod/R_def_apr
+
+def R_normalized_threshold(m,R_mod,d,ptype,e0):
+    '''
+        Normalization of R to april as default atmsophere and Sibyll2.3c
+        e0 is set according to the calculation step to find optimal e0
+
+    '''
+    # default parameters
+    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs_p=1.0, cs_k=1.0, e0=e0) #default cs
     R_def_apr = R(m,dNu_dmu_apr)
     
     return R_mod/R_def_apr
@@ -103,18 +115,15 @@ def main(calculation):
     m = mh.n_mu_vec # muon multiplicity
 
     if calc_tag == 'k-pi':
-        
-        cs_p1_values = [1.0] 
-        cs_p2_values = [0.9,1.0,1.1]
-        cs_k1_values = [1.0]
-        cs_k2_values = [0.9,1.0,1.1]
+        cs_p_values = [0.8,0.9,0.99,1.0,1.01,1.1,1.2] 
+        cs_k_values = [0.8,0.9,0.99,1.0,1.01,1.1,1.2]     
         ptype_values = [2212] 
-        season_values = ["apr"]  #  seasons
-        e0_values = [1e3]
-        e1_values = [10000]
+        season_values = ["jan", "apr", "jul"] #  seasons
+        e0_values = [3.65]
+        
 
     elif calc_tag == 'threshold':
-        
+               
         cs_p_values = [0.99,1.00,1.01] #[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
         cs_k_values = [1.00]
         ptype_values = [2212] 
@@ -147,10 +156,15 @@ def main(calculation):
                     for season in season_values:
                         for e0 in e0_values:
                             # Call functions to compute R
-
+                          
                             dNmu_dmu_mod = dNmu_dmu(d,season, ptype , cs_p, cs_k, e0)
                             R_mod = R(m,dNmu_dmu_mod)
-                            R_norm = R_normalized(m,R_mod,d,ptype)
+                            if calc_tag =='threshold':
+                                R_norm = R_normalized_threshold(m,R_mod,d,ptype,e0)    
+                                print('e0 changed in normaliyation of R')                           
+
+                            else:
+                                R_norm = R_normalized(m,R_mod,d,ptype)
                                 
                             # Store the result in the dictionary
                             results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0))] = R_norm
