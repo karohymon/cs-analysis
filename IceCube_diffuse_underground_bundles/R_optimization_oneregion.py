@@ -143,7 +143,7 @@ def main():
                                     R_norm = R_normalized(m,R_mod,d,ptype, e0, ll, ul)
                                         
                                     # Store the result in the dictionary
-                                    results[(str(d), str(ll), str(ul), str(cs_p), str(cs_p), str(cs_k), str(ptype), season, str(e0))] = R_norm.tolist()
+                                    results[(str(d), str(ll), str(ul), str(cs_p), str(cs_k), str(ptype), season, str(e0))] = R_norm.tolist()
 
     with open("/hetghome/khymon/cs-files/R_value_const_pi-air_sibyll23c_smooth_R_integration_optimization_oneregion.pkl", "wb") as f:
         pickle.dump(results, f)
