@@ -11,14 +11,15 @@ import click
 import os
 
 class ModIntCrossSections(InteractionCrossSections):
-    def __init__(self, mceq_hdf_db, interaction_model="SIBYLL2.3c", scale_factor_region1=None, e0=1., increase='const'):
+    def __init__(self, mceq_hdf_db, interaction_model="SIBYLL2.3c", scale_factor_region1=None, e0=1., e1=None, increase='const'):
         self.scale_factor_region1 = scale_factor_region1  # Scaling factor for e0 to e1
         self.e0 = e0
+        self.e1 = e1
         self.increase = increase
         self.interaction_model = interaction_model
         super().__init__(mceq_hdf_db, interaction_model)  # Call parent constructor
 
-    def modify_cs(self, scale_factor_region1=None, e0=None, increase=None):
+    def modify_cs(self, scale_factor_region1=None, e0=None, e1=None, increase=None):
         """Modify pion and kaon interaction cross-sections in two energy regions."""
         
         # Set defaults
@@ -26,23 +27,16 @@ class ModIntCrossSections(InteractionCrossSections):
             scale_factor_region1 = self.scale_factor_region1
         if e0 is None:
             e0 = self.e0
+        if e1 is None:
+            e1 = self.e1  # Use class attribute if not passed explicitly
+            
         
         # Energy ranges
         e0 = 10. ** e0 # convert log number to float
         e_range1 = (self.energy_grid.c >= e0)
-        
-        print(f"Applying mod: region1 (>={e0}) with {scale_factor_region1}")
 
-        # Apply scaling factors first for the energy range before e1 (excluding idx_at_e1)
-        #if self.increase == 'exp':
-        #    for p, sf1, sf2 in zip([211, 321], scale_factor_region1, scale_factor_region2):
-        #        self.index_d[p][e_range1] *= (self.energy_grid.c[e_range1] / e0) ** sf1
-        #elif self.increase == 'const':
-        #    for p, sf1, sf2 in zip([211, 321], scale_factor_region1, scale_factor_region2):
-        #        self.index_d[p][e_range1] *= sf1
-
-        #        """Smooth transition for values around e1 using interpolation."""
-        
+        if e1 is not None:
+            e1 = 10. ** e1  # Convert e1 if it's provided          
                
                       
         # Find the index at e1 and e0
@@ -52,10 +46,18 @@ class ModIntCrossSections(InteractionCrossSections):
         energy_at_e0 = self.energy_grid.c[idx_at_e0] if idx_at_e0 < len(self.energy_grid.c) else None
         print('e0 = ',energy_at_e0)
         
-        # Ensure e1 is within the energy grid
+        # Ensure e0 is within the energy grid
         if energy_at_e0 is None or energy_at_e0 > self.energy_grid.c[-1]:
             print(f"Warning: e01 = {e0} is outside the energy grid, using the last energy grid value instead.")
             energy_at_e0 = self.energy_grid.c[-1]  # Set to last value if out of bounds
+
+         # Ensure e1 is within the energy grid
+        if e1 is not None:
+            idx_at_e1 = np.searchsorted(self.energy_grid.c, e1)
+            energy_at_e1 = self.energy_grid.c[idx_at_e1] if idx_at_e1 < len(self.energy_grid.c) else None
+            if energy_at_e1 is None or energy_at_e1 > self.energy_grid.c[-1]:
+                print(f"Warning: e1 = {e1} is outside the energy grid, using the last energy grid value instead.")
+                energy_at_e1 = self.energy_grid.c[-1]  # Set to last value if out of bounds
         
         # Interpolation of scaling factors between energy bins around e1
         # Iterate through the particles and scaling factors
@@ -63,13 +65,23 @@ class ModIntCrossSections(InteractionCrossSections):
         for p, sf1 in zip([211, 321], self.scale_factor_region1):
             print(f"Processing particle {p} with sf1={sf1} ")
 
-            if self.increase == 'exp':
-                # Avoid modifying idx_at_e1 or bins after it in this loop
-                if e0 is not None:
-                    self.index_d[p][(idx_at_e0+1):] = self.index_d[p][(idx_at_e0+1):] * (self.energy_grid.c[idx_at_e0:] / e0) ** sf1
-            elif self.increase == 'const':
-                self.index_d[p][(idx_at_e0+1):] *= sf1  # Scale for region2 from e1 +1 onward
-            
+            if e1 is None:
+                if self.increase == 'exp':
+                    # Avoid modifying idx_at_e1 or bins after it in this loop
+                    if e0 is not None:
+                        self.index_d[p][(idx_at_e0+1):] = self.index_d[p][(idx_at_e0+1):] * (self.energy_grid.c[idx_at_e0:] / e0) ** sf1
+                elif self.increase == 'const':
+                    self.index_d[p][(idx_at_e0+1):] *= sf1  # Scale for region2 from e1 +1 onward
+            else:
+                # do not apply scale factor above e1
+                if self.increase == 'exp':
+                    # Avoid modifying idx_at_e1 or bins after it in this loop
+                    if e0 is not None:
+                        self.index_d[p][(idx_at_e0+1):idx_at_e1] = self.index_d[p][(idx_at_e0+1):idx_at_e1] * (self.energy_grid.c[idx_at_e0:idx_at_e1] / e0) ** sf1 #e1 is not included because it will be modified later
+                elif self.increase == 'const':
+                    self.index_d[p][(idx_at_e0+1):idx_at_e1] *= sf1  # Scale for region2 from e1 +1 onward
+
+
             # Interpolation at e0
             cs_e0 = CubicSpline(
                 [self.energy_grid.c[idx_at_e0 - 1], self.energy_grid.c[idx_at_e0 + 1]],
@@ -79,7 +91,17 @@ class ModIntCrossSections(InteractionCrossSections):
             interpolated_value_e0 = cs_e0(energy_at_e0)
             self.index_d[p][idx_at_e0] *= interpolated_value_e0
 
-            
+            if e1 is not None:
+                # add interpolated value for e1
+                cs_e1 = CubicSpline(
+                [self.energy_grid.c[idx_at_e1 - 1], self.energy_grid.c[idx_at_e1 + 1]],
+                [sf1,1.],
+                bc_type=((1, 0.0), (1, 0.0))
+                )
+                interpolated_value_e1 = cs_e1(energy_at_e1)
+                self.index_d[p][idx_at_e1] *= interpolated_value_e1
+
+                
 
             # Single plot combining both e0 and e1 for each particle
             #plt.figure(figsize=(6, 4))

@@ -29,12 +29,13 @@ from cs_modifier_with_smooth_transition_oneregion import ModIntCrossSections
 @click.option('--scale_factor_p','-a', help='cs modification for region 1 pion, 1 = untuned for const, 0 = untuned for exp') 
 @click.option('--scale_factor_k','-c', help='cs modification for region 1 pion, 1 = untuned for const, 0 = untuned for exp') 
 @click.option('--e0','-l', help='threshold above which 1st modification is applied')
+@click.option('--e1', '-t', help='Threshold above which 2nd modification is applied (optional)', type=float, default=None)
 @click.option('--increase','-i', help='const or exp', default='const')
 @click.option('--interactionmodel','-m', help='hadr. interaction model', default="SIBYLL2.3c")
 @click.option('--nucleus','-n', help='proton: 2212 or iron: 5626', default="2212")
 
 
-def main(scale_factor_p, scale_factor_k, e0,increase,interactionmodel,nucleus):
+def main(scale_factor_p, scale_factor_k, e0,e1, increase,interactionmodel,nucleus):
 
 
 
@@ -71,7 +72,7 @@ def main(scale_factor_p, scale_factor_k, e0,increase,interactionmodel,nucleus):
     thetas = np.degrees(np.arccos(cos_thetas))
 
     # modify cross section
-    modcs = ModIntCrossSections(mceq_air._mceq_db, interaction_model="SIBYLL2.3c", scale_factor_region1=scale_factor_region1, e0=e0,  increase='const') 
+    modcs = ModIntCrossSections(mceq_air._mceq_db, interaction_model="SIBYLL2.3c", scale_factor_region1=scale_factor_region1, e0=e0, e1=e1,  increase='const') 
 
     mceq_tune._int_cs = modcs # add modification to cross section in mceq instance
     mceq_tune.set_interaction_model(interactionmodel, force=True) # necessary to force cross section change
@@ -130,20 +131,42 @@ def main(scale_factor_p, scale_factor_k, e0,increase,interactionmodel,nucleus):
         ground_muspec_prim_energies.append(season_energies)
 
     # adapt file names
-    pickle.dump(
-        [mceq_air.e_grid, cos_thetas, cr_grid, ground_muspec_prim_energies[0], ground_muspec_prim_energies[1], ground_muspec_prim_energies[2]],
-        open(f"/hetghome/khymon/cs-files/smooth-transition/ground_muspec_prim_energies_season_cstune{nucleus}"
-            f"_pi{float(scale_factor_p):.2f}"
-            f"_k{float(scale_factor_k):.2f}"
-            f"_e0{float(e0):.2f}_{increase}.pkl", "wb"),
-    )
-    pickle.dump(
-        [mceq_air.e_grid, cos_thetas, surface_flux_GSF[0], surface_flux_GSF[1], surface_flux_GSF[2]],
-        open(f"/hetghome/khymon/cs-files/smooth-transition/surface_fluxes_season{nucleus}"
-            f"_pi{float(scale_factor_p):.2f}"
-            f"_k{float(scale_factor_k):.2f}"
-            f"_e0{float(e0):.2f}_{increase}.pkl", "wb"),
-    )
+    if e1 is None:
+
+        pickle.dump(
+            [mceq_air.e_grid, cos_thetas, cr_grid, ground_muspec_prim_energies[0], ground_muspec_prim_energies[1], ground_muspec_prim_energies[2]],
+            open(f"/hetghome/khymon/cs-files/smooth-transition/ground_muspec_prim_energies_season_cstune{nucleus}"
+                f"_pi{float(scale_factor_p):.2f}"
+                f"_k{float(scale_factor_k):.2f}"
+                f"_e0{float(e0):.2f}_{increase}.pkl", "wb"),
+                
+        )
+        pickle.dump(
+            [mceq_air.e_grid, cos_thetas, surface_flux_GSF[0], surface_flux_GSF[1], surface_flux_GSF[2]],
+            open(f"/hetghome/khymon/cs-files/smooth-transition/surface_fluxes_season{nucleus}"
+                f"_pi{float(scale_factor_p):.2f}"
+                f"_k{float(scale_factor_k):.2f}"
+                f"_e0{float(e0):.2f}_{increase}.pkl", "wb"),
+        )
+    else: 
+        pickle.dump(
+            [mceq_air.e_grid, cos_thetas, cr_grid, ground_muspec_prim_energies[0], ground_muspec_prim_energies[1], ground_muspec_prim_energies[2]],
+            open(f"/hetghome/khymon/cs-files/smooth-transition/ground_muspec_prim_energies_season_cstune{nucleus}"
+                f"_pi{float(scale_factor_p):.2f}"
+                f"_k{float(scale_factor_k):.2f}"
+                f"_e0{float(e0):.2f}_{increase}"
+                f"_e1{float(e1):.2f}.pkl", "wb"),
+                
+        )
+        pickle.dump(
+            [mceq_air.e_grid, cos_thetas, surface_flux_GSF[0], surface_flux_GSF[1], surface_flux_GSF[2]],
+            open(f"/hetghome/khymon/cs-files/smooth-transition/surface_fluxes_season{nucleus}"
+                f"_pi{float(scale_factor_p):.2f}"
+                f"_k{float(scale_factor_k):.2f}"
+                f"_e0{float(e0):.2f}_{increase}"
+                f"_e1{float(e1):.2f}.pkl", "wb"),
+                
+        )
 
 
     
