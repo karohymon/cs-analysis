@@ -229,12 +229,19 @@ def _flux(angle, flux_label, ptype=2212, cs_p=1.0, cs_k=1.0, e0 =1000.0, e1=None
     cth = np.cos(np.radians(angle))
     assert np.min(cth) >= cos_thetas[0] and np.max(cth) <= cos_thetas[-1]
 
-    key = (ptype, cs_p, cs_k, e0, e1 if cs_p == 1.0 else next((k[4] for k in intp_ground_mu_yields.keys() if k[:4] == (ptype, cs_p, cs_k, e0)), None))
+    if cs_p == 1.0:
+        e1 = 'inf'  # Explicitly set e1 to 'inf' when cs_p = 1.0
+    else:
+        # Find the correct e1 value for cs_p = 1.01
+        possible_e1_values = sorted(set(k[4] for k in intp_ground_mu_yields.keys() if k[:4] == (ptype, cs_p, cs_k, e0)))
+        e1 = possible_e1_values[0] if possible_e1_values else None  # Pick the first valid e1
+
+    key = (ptype, cs_p, cs_k, e0, e1)
 
     if key not in intp_ground_mu_yields:
         raise KeyError(f"Invalid key: {key}, available keys: {list(intp_ground_mu_yields.keys())}")
 
-    
+        
 
     
     if flux_label == "daemonflux":
