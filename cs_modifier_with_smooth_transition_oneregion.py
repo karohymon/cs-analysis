@@ -31,8 +31,9 @@ class ModIntCrossSections(InteractionCrossSections):
             e1 = self.e1  # Use class attribute if not passed explicitly
             
         
-        # Energy ranges
-        e0 = 10. ** e0 # convert log number to float
+        # Energy ranges    
+        e0 = 10. ** e0
+                
         e_range1 = (self.energy_grid.c >= e0)
 
         if e1 is not None:
@@ -40,11 +41,19 @@ class ModIntCrossSections(InteractionCrossSections):
                
                       
         # Find the index at e1 and e0
-        idx_at_e0 = np.searchsorted(self.energy_grid.c, e0)
+        idx_at_e0 = np.searchsorted(self.energy_grid.c, e0, side='left')
+        # Adjust if the found index is not exactly matching e0
+        if idx_at_e0 > 0 and np.isclose(e0, self.energy_grid.c[idx_at_e0-1], atol=1e-10):
+            idx_at_e0 -= 1  # Correct overshoot
+        print(f"Index found by searchsorted: {idx_at_e0}")
+        print(f"Index found: {idx_at_e0}")
+        print(f"Energy grid value at index {idx_at_e0}: {self.energy_grid.c[idx_at_e0]:.15f}")
+        print(f"Energy grid value at index {idx_at_e0-1}: {self.energy_grid.c[idx_at_e0-1]:.15f}")
+        print(f"Energy grid value at index {idx_at_e0+1}: {self.energy_grid.c[idx_at_e0+1]:.15f}")
         
         # The index at e1 will be the first position where the energy is greater than or equal to e1
         energy_at_e0 = self.energy_grid.c[idx_at_e0] if idx_at_e0 < len(self.energy_grid.c) else None
-        print('e0 = ',energy_at_e0)
+        print('e0 = ',np.log10(energy_at_e0))
         
         # Ensure e0 is within the energy grid
         if energy_at_e0 is None or energy_at_e0 > self.energy_grid.c[-1]:
@@ -53,12 +62,13 @@ class ModIntCrossSections(InteractionCrossSections):
 
          # Ensure e1 is within the energy grid
         if e1 is not None:
-            idx_at_e1 = np.searchsorted(self.energy_grid.c, e1)
+            idx_at_e1 = np.searchsorted(self.energy_grid.c, e1, side='left')
             energy_at_e1 = self.energy_grid.c[idx_at_e1] if idx_at_e1 < len(self.energy_grid.c) else None
             if energy_at_e1 is None or energy_at_e1 > self.energy_grid.c[-1]:
                 print(f"Warning: e1 = {e1} is outside the energy grid, using the last energy grid value instead.")
                 energy_at_e1 = self.energy_grid.c[-1]  # Set to last value if out of bounds
-        
+            print('e1 = ',np.log10(energy_at_e1))
+            print('egrid = ',np.log10(self.energy_grid.c))
         # Interpolation of scaling factors between energy bins around e1
         # Iterate through the particles and scaling factors
         # Loop over particles, scale factors for each region (region1 and region2)
