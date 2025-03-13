@@ -68,7 +68,7 @@ def main(scale_factor_p, scale_factor_k, e0,e1, increase,interactionmodel,nucleu
     mceq_air.set_interaction_model("SIBYLL23C", force=True)
     mceq_air.set_theta_deg(0)
 
-    cos_thetas = np.arange(0.8, 1.001, 0.1)
+    cos_thetas = np.arange(0.5, 1.001, 0.1)
     thetas = np.degrees(np.arccos(cos_thetas))
 
     # modify cross section
