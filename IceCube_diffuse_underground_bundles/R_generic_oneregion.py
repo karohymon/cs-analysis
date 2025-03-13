@@ -102,8 +102,9 @@ def R_normalized_threshold(m,R_mod,d,ptype,e0,e1=None):
 
 @click.command()
 @click.option('--calculation','-c', help='k-pi, threshold, general')
+@click.option('--normalization', '-n', is_flag=True, help="Enable normalization (default: False)")
 
-def main(calculation):
+def main(calculation,normalization):
     '''
         k-pi: only iterate between k2 and p2
         threshold: change only e0
@@ -176,8 +177,11 @@ def main(calculation):
                                 else:
                                     R_norm = R_normalized(m, R_mod, d, ptype)
 
+                                if normalization:
                                 # Store the result in the dictionary, use e1='inf' for this special case
-                                results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm
+                                    results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm
+                                else: 
+                                    results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_mod
                         else:
                             # For other cs_p values: handle both pairwise and non-pairwise combinations of e0 and e1
                             for e0, e1 in zip(e0_values, e1_values if e1_values is not None else [None]):
@@ -190,11 +194,19 @@ def main(calculation):
                                 else:
                                     R_norm = R_normalized(m, R_mod, d, ptype)
 
-                                # Store the result in the dictionary with both e0 and e1 (or "inf" if e1 is None)
-                                results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), str(e1) if e1 is not None else "inf")] = R_norm
+                                if normalization:
+                                # Store the result in the dictionary, use e1='inf' for this special case
+                                    results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm
+                                else: 
+                                    results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_mod
 
-    with open("/hetghome/khymon/cs-files/R_value_const_pi-air_k-air_sibyll23c_smooth_oneregion_" + str(calc_tag) + ".pkl", "wb") as f:
-        pickle.dump(results, f)
+    if normalization:
+        with open("/hetghome/khymon/cs-files/R_value_const_pi-air_k-air_sibyll23c_smooth_oneregion_" + str(calc_tag) + ".pkl", "wb") as f:
+            pickle.dump(results, f)
+
+    else:    
+        with open("/hetghome/khymon/cs-files/R_value_const_pi-air_k-air_sibyll23c_smooth_oneregion_" + str(calc_tag) + "_nonorm.pkl", "wb") as f:
+            pickle.dump(results, f)
 
 
 
