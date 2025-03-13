@@ -112,7 +112,7 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, e0_values, e1_
         for key in ground_muspec_energies  # iterate over the keys of the ground_muspec_energies dictionary
     }
 
-    print("Available keys:", list(intp_ground_mu_yields.keys()))
+    #print("Available keys:", list(intp_ground_mu_yields.keys()))
 
     # Now calculate angles and c_wi globally
     angles = np.degrees(np.arccos(cos_thetas))  # Convert from cos(theta) to theta in degrees
