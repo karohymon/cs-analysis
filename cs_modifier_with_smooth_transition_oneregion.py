@@ -63,6 +63,9 @@ class ModIntCrossSections(InteractionCrossSections):
          # Ensure e1 is within the energy grid
         if e1 is not None:
             idx_at_e1 = np.searchsorted(self.energy_grid.c, e1, side='left')
+            # Adjust if the found index is not exactly matching e1
+            if idx_at_e1 > 0 and np.isclose(e1, self.energy_grid.c[idx_at_e1-1], atol=1e-10):
+                idx_at_e1 -= 1  # Correct overshoot
             energy_at_e1 = self.energy_grid.c[idx_at_e1] if idx_at_e1 < len(self.energy_grid.c) else None
             if energy_at_e1 is None or energy_at_e1 > self.energy_grid.c[-1]:
                 print(f"Warning: e1 = {e1} is outside the energy grid, using the last energy grid value instead.")
