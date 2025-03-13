@@ -139,7 +139,7 @@ dmnflux = Flux("IceCube")
 _X_MIN = 0.5
 _X_MAX = 14
 
-_SLANT_DEPTHS = np.linspace(_X_MIN, _X_MAX, int(2 * (_X_MAX - _X_MIN) + 1))
+_SLANT_DEPTHS = np.linspace(_X_MIN, _X_MAX, int(1 * (_X_MAX - _X_MIN) + 1))
 # _ANGLES = np.degrees(np.arccos(_X_MIN / _SLANT_DEPTHS))
 
 
