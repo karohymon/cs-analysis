@@ -122,6 +122,7 @@ def main(calculation,normalization):
         season_values = ["jan", "apr", "jul"] #  seasons
         e0_values = [3.65]
         e1_values = None
+        pairwise = False
         
 
     elif calc_tag == 'threshold':
@@ -132,6 +133,7 @@ def main(calculation,normalization):
         season_values = ["jan", "apr", "jul"]  #  seasons
         e0_values = [2.05,2.15,2.25,2.35,2.45,2.55,2.65,2.75,2.85,2.95,3.05,3.15,3.25,3.35,3.45,3.55,3.65,3.75,3.85,3.95,4.05,4.15,4.25,4.35,4.45,4.55,4.65,4.75,4.85,4.95]
         e1_values = None
+        pairwise = False
 
     elif calc_tag =='energybin_test':
         cs_p_values = [1.00,1.01] #[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
@@ -196,9 +198,9 @@ def main(calculation,normalization):
 
                                 if normalization:
                                 # Store the result in the dictionary, use e1='inf' for this special case
-                                    results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm
+                                    results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), str(e1))] = R_norm
                                 else: 
-                                    results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_mod
+                                    results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), str(e1))] = R_mod
 
     if normalization:
         with open("/hetghome/khymon/cs-files/R_value_const_pi-air_k-air_sibyll23c_smooth_oneregion_" + str(calc_tag) + ".pkl", "wb") as f:

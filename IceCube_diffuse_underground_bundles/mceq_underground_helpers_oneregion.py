@@ -66,10 +66,10 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, e0_values, e1_
                         for e0 in e0_values:
                             for e1 in e1_list:  # Iterate over all combinations of e0 and e1
                                 flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), round(e1, 2) if e1 is not None else "inf")] = \
-                                    cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const_{'inf' if e1 is None else f'e1{e1:.2f}'}.pkl"
+                                    cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const{'' if e1 is None else f'_e1{e1:.2f}'}.pkl"
 
                                 muspec_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), round(e1, 2) if e1 is not None else "inf")] = \
-                                    cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const_{'inf' if e1 is None else f'e1{e1:.2f}'}.pkl"
+                                    cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const{'' if e1 is None else f'_e1{e1:.2f}'}.pkl"
 
  # Load the data dynamically for surface fluxes and ground mu energies
     surface_fluxes = {}
@@ -139,7 +139,7 @@ dmnflux = Flux("IceCube")
 _X_MIN = 0.5
 _X_MAX = 14
 
-_SLANT_DEPTHS = np.linspace(_X_MIN, _X_MAX, int(1 * (_X_MAX - _X_MIN) + 1))
+_SLANT_DEPTHS = np.linspace(_X_MIN, _X_MAX, int(2 * (_X_MAX - _X_MIN) + 1))
 # _ANGLES = np.degrees(np.arccos(_X_MIN / _SLANT_DEPTHS))
 
 
