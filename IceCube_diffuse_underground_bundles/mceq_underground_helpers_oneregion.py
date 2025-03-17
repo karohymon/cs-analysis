@@ -44,7 +44,8 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, e0_values, e1_
             for cs_k in cs_k_values:
                 if cs_p == 1.0:
                     # Special case when cs_p is 1.0: only use one specific combination of e0 and e1 = None
-                    for e0 in e0_values:
+                    #for e0 in e0_values: #only one e0 needed technically
+                    
                         flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), "inf")] = \
                             cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const.pkl"
                         
@@ -77,7 +78,8 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, e0_values, e1_
                                 muspec_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), "inf")] = \
                                     cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const.pkl"
 
- # Load the data dynamically for surface fluxes and ground mu energies
+     
+    # Load the data dynamically for surface fluxes and ground mu energies
     surface_fluxes = {}
     ground_muspec_energies = {}
 
@@ -96,6 +98,14 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, e0_values, e1_
                 "apr": np.asarray(fluxes[1]).swapaxes(0, 1),
                 "jul": np.asarray(fluxes[2]).swapaxes(0, 1),
             }
+    print(cos_thetas.shape)
+
+    for key in surface_fluxes:
+        for season, flux in surface_fluxes[key].items():
+            print(f"{key} - {season}:")
+            print(f"Length of cos_thetas: {len(cos_thetas)}")
+            print(f"Shape of flux: {flux.shape}")  # Print full shape to check dimensions
+            print("---")
 
     # Create interpolators for surface fluxes
     intp_surface_fluxes = {
