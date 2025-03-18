@@ -44,17 +44,23 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, e0_values, e1_
             for cs_k in cs_k_values:
                 if cs_p == 1.0:
                     # Special case when cs_p is 1.0: only use one specific combination of e0 and e1 = None
-                    #for e0 in e0_values: #only one e0 needed technically
-                    
-                        flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), "inf")] = \
-                            cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const.pkl"
+                    #for e0 in range(len(e0)): #only one e0 needed technically
+
+                    e0 = 2.05#e0_values[0]  # Assign a default value for accessing the keys correctly
                         
-                        muspec_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), "inf")] = \
-                            cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const.pkl"
+                    flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), "inf")] = \
+                        cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}.pkl"#_e0{e0:.2f}_const.pkl"
+                        
+                    muspec_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), "inf")] = \
+                        cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}.pkl"#_e0{e0:.2f}_const.pkl"
                 else:
                     # Handle case where pairwise is True
                     if pairwise:
                         for e0, e1 in zip(e0_values, e1_list):  # Pair e0 and e1 element-wise
+                            e0 = float(e0)  # Convert NumPy scalar to float
+                            e1 = float(e1)  # Convert e1 as well if needed
+
+                                                        
                             flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), round(e1, 2) if e1 is not None else "inf")] = \
                                 cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const_{'inf' if e1 is None else f'e1{e1:.2f}'}.pkl"
                             
@@ -98,15 +104,7 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, e0_values, e1_
                 "apr": np.asarray(fluxes[1]).swapaxes(0, 1),
                 "jul": np.asarray(fluxes[2]).swapaxes(0, 1),
             }
-    print(cos_thetas.shape)
-
-    for key in surface_fluxes:
-        for season, flux in surface_fluxes[key].items():
-            print(f"{key} - {season}:")
-            print(f"Length of cos_thetas: {len(cos_thetas)}")
-            print(f"Shape of flux: {flux.shape}")  # Print full shape to check dimensions
-            print("---")
-
+       
     # Create interpolators for surface fluxes
     intp_surface_fluxes = {
         key: {
@@ -119,7 +117,7 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, e0_values, e1_
     # Create interpolators for ground mu yields
     intp_ground_mu_yields = {
         key: {
-            season: [
+            season: [ 
                 ip.interp1d(cos_thetas, ground_muspec_energies[key][season][:, ie, :], axis=0, kind="linear")
                 for ie in range(len(cr_grid))
             ]
@@ -133,6 +131,7 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, e0_values, e1_
     # Now calculate angles and c_wi globally
     angles = np.degrees(np.arccos(cos_thetas))  # Convert from cos(theta) to theta in degrees
     c_wi = np.diff(cos_thetas)  # Calculate the differential width in cos(theta)
+
 def some_function_that_uses_angles():
     global angles
     if angles is None:
@@ -156,6 +155,8 @@ _X_MIN = 0.5
 _X_MAX = 14
 
 _SLANT_DEPTHS = np.linspace(_X_MIN, _X_MAX, int(2 * (_X_MAX - _X_MIN) + 1))
+#step = 0.5  # Since 2 * (X_MAX - X_MIN) + 1 suggests 0.5 spacing
+#_SLANT_DEPTHS = np.arange(_X_MIN, _X_MAX + step, step)
 # _ANGLES = np.degrees(np.arccos(_X_MIN / _SLANT_DEPTHS))
 
 
@@ -242,8 +243,17 @@ def _flux(angle, flux_label, ptype=2212, cs_p=1.0, cs_k=1.0, e0 =1000.0, e1=None
     Returns:
         numpy.ndarray: Flux.
     """
+
     cth = np.cos(np.radians(angle))
-    assert np.min(cth) >= cos_thetas[0] and np.max(cth) <= cos_thetas[-1]
+
+    # Directly set the maximum value to 1.0 for cos(theta)
+    cos_thetas_max_adjusted = 1.0  # Explicitly set the upper bound to 1.0
+
+    # Check that the min and max of cth are within the bounds of cos_thetas
+    assert np.min(cth) >= cos_thetas[0] and np.max(cth) <= cos_thetas_max_adjusted
+
+
+
 
     if cs_p == 1.0:
         e1 = 'inf'  # Explicitly set e1 to 'inf' when cs_p = 1.0

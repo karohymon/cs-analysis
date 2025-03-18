@@ -16,7 +16,7 @@ def X(d):
     ''' calculate slant depth ad a given vertical depth in km'''
     s_d = mh.slant_depths
     angles = mh.angles
- 
+     
     return d/np.cos(np.deg2rad(angles))
 
 def dNmu_dmu(d,month, ptype, cs_p, cs_k, e0,e1=None): # month = str
@@ -140,8 +140,8 @@ def main(calculation,normalization):
         cs_k_values = [1.00]
         ptype_values = [2212] 
         season_values = ["jan", "apr", "jul"]  #  seasons
-        e0_values = [2.05,2.15,2.25,2.35,2.45,2.55,2.65,2.75,2.85,2.95,3.05,3.15,3.25,3.35,3.45,3.55,3.65,3.75,3.85,3.95,4.05,4.15,4.25,4.35,4.45,4.55,4.65,4.75,4.85]
-        e1_values = [2.25,2.35,2.45,2.55,2.65,2.75,2.85,2.95,3.05,3.15,3.25,3.35,3.45,3.55,3.65,3.75,3.85,3.95,4.05,4.15,4.25,4.35,4.45,4.55,4.65,4.75,4.85,4.95,5.05]
+        e0_values = [2.05]#,2.15,2.25,2.35,2.45,2.55,2.65,2.75,2.85,2.95,3.05,3.15,3.25,3.35,3.45,3.55,3.65,3.75,3.85,3.95,4.05,4.15,4.25,4.35,4.45,4.55,4.65,4.75,4.85]
+        e1_values = [2.25]#,2.35,2.45,2.55,2.65,2.75,2.85,2.95,3.05,3.15,3.25,3.35,3.45,3.55,3.65,3.75,3.85,3.95,4.05,4.15,4.25,4.35,4.45,4.55,4.65,4.75,4.85,4.95,5.05]
         pairwise = True
 
     elif calc_tag =='energybin_test_kaon':
@@ -170,25 +170,23 @@ def main(calculation,normalization):
 
     for d in d_values:
         x_mod = X(d)  # for specific depth
-
+        
         for cs_p in cs_p_values:
             for cs_k in cs_k_values:
                 for ptype in ptype_values:
                     for season in season_values:
                         if cs_p == 1.0:
                             # Special case when cs_p = 1.0: use 'inf' for e1
-                            for e0 in e0_values:
-                                # Compute R with special handling for cs_p=1.0
-                                dNmu_dmu_mod = dNmu_dmu(d, season, ptype, cs_p, cs_k, e0)
-                                R_mod = R(m, dNmu_dmu_mod)
-                                if calc_tag == 'threshold':
-                                    R_norm = R_normalized_threshold(m, R_mod, d, ptype, e0)
-                                    print('e0 changed in normalization of R')
-                                else:
-                                    R_norm = R_normalized(m, R_mod, d, ptype)
-
-                                # Store the result in the dictionary
-                                results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm if normalization else R_mod
+                            e0 = e0_values[0]  # Assign a default value for accessing the keys correctly
+                            # Compute R with special handling for cs_p=1.0
+                            dNmu_dmu_mod = dNmu_dmu(d, season, ptype, cs_p, cs_k, e0)
+                            R_mod = R(m, dNmu_dmu_mod)
+                            if calc_tag == 'threshold':
+                                R_norm = R_normalized_threshold(m, R_mod, d, ptype, e0)
+                                print('e0 changed in normalization of R')
+                            
+                            # Store the result in the dictionary
+                            results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm if normalization else R_mod
                         else:
                             # For other cs_p values: handle both pairwise and non-pairwise combinations of e0 and e1
                             if e1_values is not None:
@@ -199,9 +197,7 @@ def main(calculation,normalization):
                                     if calc_tag == 'threshold':
                                         R_norm = R_normalized_threshold(m, R_mod, d, ptype, e0)
                                         print('e0 changed in normalization of R')
-                                    else:
-                                        R_norm = R_normalized(m, R_mod, d, ptype)
-
+                                    
                                     # Store the result in the dictionary
                                     results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), str(e1))] = R_norm if normalization else R_mod
                             else:
@@ -214,9 +210,7 @@ def main(calculation,normalization):
                                         if calc_tag == 'threshold':
                                             R_norm = R_normalized_threshold(m, R_mod, d, ptype, e0)
                                             print('e0 changed in normalization of R')
-                                        else:
-                                            R_norm = R_normalized(m, R_mod, d, ptype)
-
+                                        
                                         # Store the result in the dictionary
                                         results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm if normalization else R_mod
 
