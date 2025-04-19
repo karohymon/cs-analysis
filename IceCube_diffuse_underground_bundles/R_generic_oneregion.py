@@ -74,7 +74,7 @@ def R(m,dN_dNmu):
         int_low[i] = np.trapezoid(dN_dNmu[i,1:19],m[1:19])
         int_high[i] = np.trapezoid(dN_dNmu[i,59:],m[59:])    
 
-    return int_high / int_low
+    return (int_high / int_low), int_low, int_high
 
 def R_normalized(m,R_mod,d,ptype):
     '''
@@ -180,39 +180,39 @@ def main(calculation,normalization):
                             e0 = e0_values[0]  # Assign a default value for accessing the keys correctly
                             # Compute R with special handling for cs_p=1.0
                             dNmu_dmu_mod = dNmu_dmu(d, season, ptype, cs_p, cs_k, e0)
-                            R_mod = R(m, dNmu_dmu_mod)
+                            R_mod, R_mod_low, R_mod_high = R(m, dNmu_dmu_mod)
                             if calc_tag == 'threshold':
                                 R_norm = R_normalized_threshold(m, R_mod, d, ptype, e0)
                                 print('e0 changed in normalization of R')
                             
                             # Store the result in the dictionary
-                            results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm if normalization else R_mod
+                            results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm if normalization else (R_mod, R_mod_low, R_mod_high)
                         else:
                             # For other cs_p values: handle both pairwise and non-pairwise combinations of e0 and e1
                             if e1_values is not None:
                                 for e0, e1 in zip(e0_values, e1_values):
                                     # Compute R for each pair of e0 and e1
                                     dNmu_dmu_mod = dNmu_dmu(d, season, ptype, cs_p, cs_k, e0)
-                                    R_mod = R(m, dNmu_dmu_mod)
+                                    R_mod, R_mod_low, R_mod_high= R(m, dNmu_dmu_mod)
                                     if calc_tag == 'threshold':
                                         R_norm = R_normalized_threshold(m, R_mod, d, ptype, e0)
                                         print('e0 changed in normalization of R')
                                     
                                     # Store the result in the dictionary
-                                    results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), str(e1))] = R_norm if normalization else R_mod
+                                    results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), str(e1))] = R_norm if normalization else (R_mod, R_mod_low, R_mod_high)
                             else:
                                 # Handle case where e1_values is None
                                 for e0 in e0_values:
                                     for e1 in ["inf"]:  # Use "inf" when e1 is None
                                         # Compute R for each pair of e0 and "inf" as e1
                                         dNmu_dmu_mod = dNmu_dmu(d, season, ptype, cs_p, cs_k, e0)
-                                        R_mod = R(m, dNmu_dmu_mod)
+                                        R_mod, R_mod_low, R_mod_hig = R(m, dNmu_dmu_mod)
                                         if calc_tag == 'threshold':
                                             R_norm = R_normalized_threshold(m, R_mod, d, ptype, e0)
                                             print('e0 changed in normalization of R')
                                         
                                         # Store the result in the dictionary
-                                        results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm if normalization else R_mod
+                                        results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm if normalization else (R_mod, R_mod_low, R_mod_high)
 
 
     if normalization:

@@ -42,7 +42,7 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, e0_values, e1_
     for ptype in ptype_values:
         for cs_p in cs_p_values:
             for cs_k in cs_k_values:
-                if cs_p == 1.0:
+                if cs_p == 1.0 and cs_k==1.0:
                     # Special case when cs_p is 1.0: only use one specific combination of e0 and e1 = None
                     #for e0 in range(len(e0)): #only one e0 needed technically
 
@@ -104,7 +104,13 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, e0_values, e1_
                 "apr": np.asarray(fluxes[1]).swapaxes(0, 1),
                 "jul": np.asarray(fluxes[2]).swapaxes(0, 1),
             }
+
+    for key in surface_fluxes:
+        print(f"Key: {key}")  # Print the key
+        print(f"Length of cos_thetas: {len(cos_thetas)}")  # Print the length of cos_thetas    
        
+        for season, flux in surface_fluxes[key].items():
+            print(f"Shape of flux for season {season}: {flux.shape}")  # Print the shape of flux  
     # Create interpolators for surface fluxes
     intp_surface_fluxes = {
         key: {
@@ -113,6 +119,8 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, e0_values, e1_
         }
         for key in surface_fluxes
     }
+
+      
 
     # Create interpolators for ground mu yields
     intp_ground_mu_yields = {
