@@ -75,7 +75,7 @@ class ModIntCrossSections(InteractionCrossSections):
         # Interpolation of scaling factors between energy bins around e1
         # Iterate through the particles and scaling factors
         # Loop over particles, scale factors for each region (region1 and region2)
-        for p, sf1 in zip([211, 321], self.scale_factor_region1):
+        for p, sf1 in zip([211, 321,2212], self.scale_factor_region1):
             print(f"Processing particle {p} with sf1={sf1} ")
 
             if e1 is None:
@@ -193,11 +193,12 @@ def runmceq(mceq_object,ptype,doys,angles): #create
 @click.option('--ptype', '-p',help='Enter dataset ptype: numu, mu', default ='numu') 
 @click.option('--scale_factor_k','-s', help='list with cs modification kaon, 1 = untuned for const, 0 = untuned for exp')
 @click.option('--scale_factor_p','-f', help='list with cs modification pion, 1 = untuned for const, 0 = untuned for exp')
+@click.option('--scale_factor_pr','-r', help='list with cs modification proton, 1 = untuned for const, 0 = untuned for exp')
 @click.option('--threshold','-t', help='threshold above which modification is applied', default='1.e4')
 @click.option('--increase','-i', help='const or exp', default='const')
 @click.option('--interactionmodel','-m', help='hadr. interaction model', default="SIBYLL2.3c")
 
-def main(config_file,ptype, scale_factor_p, scale_factor_k, threshold,increase,interactionmodel):
+def main(config_file,ptype, scale_factor_p, scale_factor_k, scale_factor_pr,threshold,increase,interactionmodel):
 
     # get arguments 
     ptype = f'{ptype}'
@@ -206,7 +207,7 @@ def main(config_file,ptype, scale_factor_p, scale_factor_k, threshold,increase,i
     threshold = np.float(f'{threshold}')
     increase = f'{increase}'
 
-    scale_factor = [scale_factor_p,scale_factor_k]
+    scale_factor = [scale_factor_p,scale_factor_k,scale_factor_pr]
 
     # read folders from config
     conf_folders = config_handler.get_json_config(str(config_file))
