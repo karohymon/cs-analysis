@@ -19,7 +19,7 @@ def X(d):
  
     return d/np.cos(np.deg2rad(angles))
 
-def dNmu_dmu(d,month, ptype, cs_p, cs_k, e0): # month = str
+def dNmu_dmu(d,month, ptype, cs_p, cs_k, cs_pr, e0): # month = str
     '''
     calculate muon flux per multiplicity
 
@@ -52,9 +52,9 @@ def dNmu_dmu(d,month, ptype, cs_p, cs_k, e0): # month = str
                                     0.,
                                     pm.GlobalSplineFitBeta(),"yields_" +month,
                                     ptype,
-                                    cs_p, cs_k, e0,
+                                    cs_p, cs_k, cs_pr, e0,
                                     norm=False
-                                ) / mh.rates(x_mod[i], angle, month, ptype, cs_p, cs_k, e0)
+                                ) / mh.rates(x_mod[i], angle, month, ptype, cs_p, cs_k, cs_pr, e0)
     return dNmudmu
 
 def R(m,dN_dNmu,lower_lim,upper_lim):
@@ -88,7 +88,7 @@ def R_normalized(m,R_mod,d,ptype,e0,lower_lim,upper_lim):
 
     '''
     # default parameters
-    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs_p=1.0, cs_k=1.0,e0=e0) #default cs
+    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs_p=1.0, cs_k=1.0, cs_pr=1.0, e0=e0) #default cs
     R_def_apr = R(m,dNu_dmu_apr,lower_lim,upper_lim)
     
     return R_mod/R_def_apr
