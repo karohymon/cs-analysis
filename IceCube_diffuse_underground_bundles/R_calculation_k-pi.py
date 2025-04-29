@@ -8,7 +8,7 @@ import pickle
 import numpy as np
 
 import crflux.models as pm
-import mceq_underground_helpers_oneregion as mh
+import mceq_underground_helper_k_pi as mh
 
 import click
 
@@ -145,8 +145,8 @@ def main(calculation,normalization):
         pairwise = True
 
     elif calc_tag =='energybin_test_kaon':
-        cs_p_values = [1.00,1.01] #[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
-        cs_k_values = [1.00]
+        cs_p_values = [1.00] #[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
+        cs_k_values = [1.00,1.01]
         ptype_values = [2212] 
         season_values = ["jan", "apr", "jul"]  #  seasons
         e0_values = [2.05,2.15,2.25,2.35,2.45,2.55,2.65,2.75,2.85,2.95,3.05,3.15,3.25,3.35,3.45,3.55,3.65,3.75,3.85,3.95,4.05,4.15,4.25,4.35,4.45,4.55,4.65,4.75,4.85]
@@ -171,11 +171,11 @@ def main(calculation,normalization):
     for d in d_values:
         x_mod = X(d)  # for specific depth
         
-        for cs_p in cs_p_values:
-            for cs_k in cs_k_values:
-                for ptype in ptype_values:
+        for ptype in ptype_values:
+            for cs_p in cs_p_values:
+                for cs_k in cs_k_values:
                     for season in season_values:
-                        if cs_p == 1.0:
+                        if cs_p == 1.0 and cs_k == 1.0:
                             # Special case when cs_p = 1.0: use 'inf' for e1
                             e0 = e0_values[0]  # Assign a default value for accessing the keys correctly
                             # Compute R with special handling for cs_p=1.0
@@ -189,9 +189,16 @@ def main(calculation,normalization):
                             results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm if normalization else (R_mod, R_mod_low, R_mod_high)
                         else:
                             # For other cs_p values: handle both pairwise and non-pairwise combinations of e0 and e1
-                            if e1_values is not None:
+                            
+                            if pairwise:
+
+                                
+                                #if e1_values is not None:
                                 for e0, e1 in zip(e0_values, e1_values):
                                     # Compute R for each pair of e0 and e1
+                                    print('pariwise loop main script',e0, e1, cs_p, cs_k)
+
+
                                     dNmu_dmu_mod = dNmu_dmu(d, season, ptype, cs_p, cs_k, e0)
                                     R_mod, R_mod_low, R_mod_high= R(m, dNmu_dmu_mod)
                                     if calc_tag == 'threshold':
