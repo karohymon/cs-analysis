@@ -271,7 +271,7 @@ def _flux(angle, flux_label, ptype=2212, cs_p=1.0, cs_k=1.0, e0 =1000.0, e1=None
         e1 = possible_e1_values[0] if possible_e1_values else None  # Pick the first valid e1
 
     key = (ptype, cs_p, cs_k, e0, e1)
-    print('key in helper',key)
+    #print('key in helper',key)
 
     if key not in intp_ground_mu_yields:
         raise KeyError(f"Invalid key: {key}, available keys: {list(intp_ground_mu_yields.keys())}")

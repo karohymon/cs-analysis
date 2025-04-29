@@ -196,7 +196,7 @@ def main(calculation,normalization):
                                 #if e1_values is not None:
                                 for e0, e1 in zip(e0_values, e1_values):
                                     # Compute R for each pair of e0 and e1
-                                    print('pariwise loop main script',e0, e1, cs_p, cs_k)
+                                    
 
 
                                     dNmu_dmu_mod = dNmu_dmu(d, season, ptype, cs_p, cs_k, e0)
