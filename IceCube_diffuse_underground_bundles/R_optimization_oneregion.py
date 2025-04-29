@@ -8,7 +8,8 @@ import pickle
 import numpy as np
 
 import crflux.models as pm
-import mceq_underground_helpers_oneregion as mh
+import mceq_underground_helper_k_pi as mh
+
 
 import click
 
@@ -16,10 +17,10 @@ def X(d):
     ''' calculate slant depth ad a given vertical depth in km'''
     s_d = mh.slant_depths
     angles = mh.angles
- 
+     
     return d/np.cos(np.deg2rad(angles))
 
-def dNmu_dmu(d,month, ptype, cs_p, cs_k, cs_pr, e0): # month = str
+def dNmu_dmu(d,month, ptype, cs_p, cs_k, e0,e1=None): # month = str
     '''
     calculate muon flux per multiplicity
 
@@ -52,12 +53,12 @@ def dNmu_dmu(d,month, ptype, cs_p, cs_k, cs_pr, e0): # month = str
                                     0.,
                                     pm.GlobalSplineFitBeta(),"yields_" +month,
                                     ptype,
-                                    cs_p, cs_k, cs_pr, e0,
+                                    cs_p, cs_k, e0,e1,
                                     norm=False
-                                ) / mh.rates(x_mod[i], angle, month, ptype, cs_p, cs_k, cs_pr, e0)
+                                ) / mh.rates(x_mod[i], angle, month, ptype, cs_p, cs_k, e0,e1)
     return dNmudmu
 
-def R(m,dN_dNmu,lower_lim,upper_lim):
+def R(m,dN_dNmu):
     ''' 
     calculate R from dN_mu from unmodified and modofied cs  
 
@@ -67,55 +68,60 @@ def R(m,dN_dNmu,lower_lim,upper_lim):
         multiplicity vector
     dN_dNmu : array
         muon flux per multiplicity
-
-    lower_lim/upper_lim : int
-        integtration limits.
-
         '''
- 
     int_low = np.zeros(len(dN_dNmu[:,0]))
     int_high = np.zeros(len(dN_dNmu[:,0]))
     for i in range(len(dN_dNmu[:,0])):
-        
-        int_low[i] = np.trapezoid(dN_dNmu[i,1:lower_lim],m[1:lower_lim]) # 19 before
-        int_high[i] = np.trapezoid(dN_dNmu[i,upper_lim:],m[upper_lim:])    #59 before
+        int_low[i] = np.trapezoid(dN_dNmu[i,1:19],m[1:19])
+        int_high[i] = np.trapezoid(dN_dNmu[i,59:],m[59:])    
 
-    return int_high / int_low
+    return (int_high / int_low), int_low, int_high
 
-def R_normalized(m,R_mod,d,ptype,e0,lower_lim,upper_lim):
+def R_normalized(m,R_mod,d,ptype):
     '''
         Normalization of R to april as default atmsophere and Sibyll2.3c
 
     '''
     # default parameters
-    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs_p=1.0, cs_k=1.0, cs_pr=1.0, e0=e0) #default cs
-    R_def_apr = R(m,dNu_dmu_apr,lower_lim,upper_lim)
+    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs_p=1.0, cs_k=1.0, e0=2.05,e1='inf') #default cs
+    R_def_apr = R(m,dNu_dmu_apr)
     
     return R_mod/R_def_apr
 
+def R_normalized_threshold(m,R_mod,d,ptype,e0,e1=None):
+    '''
+        Normalization of R to april as default atmsophere and Sibyll2.3c
+        e0 is set according to the calculation step to find optimal e0
 
+    '''
+    # default parameters
+    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs_p=1.0, cs_k=1.0, e0=e0,e1=e1) #default cs
+    R_def_apr = R(m,dNu_dmu_apr)
+    
+    return R_mod/R_def_apr
 
+@click.command()
+@click.option('--normalization', '-n', is_flag=True, help="Enable normalization (default: False)")
 
-def main():
-  
-  
+def main(normalization): 
        
     m = mh.n_mu_vec # muon multiplicity
 
     d_values = [1.5, 3.5]# detectpr depth: 1.5 or 3.5km
-    cs_p_values = [1.0,1.01] #[0.5,0.6,0.7,0.8,0.9,1.0,1.1,1.2,1.3,1.4,1.5]  # List of cross-section values: pion-air
-    cs_k_values = [1.0]
-    ptype_values = [2212] #, 402, 1608, 5626]  # particle types
-    season_values = ["jan","apr","jul"]  #  seasons
-    e0_values = [2.95]
+    cs_p_values = [1.00,1.01]   # List of cross-section values: pion-air
+    cs_k_values = [1.00]
+    ptype_values = [2212] 
+    season_values = ["jan", "apr", "jul"]  #  seasons
+    e0_values = [2.05,2.15,2.25,2.35,2.45,2.55,2.65,2.75,2.85,2.95,3.05,3.15,3.25,3.35,3.45,3.55,3.65,3.75,3.85,3.95,4.05,4.15,4.25,4.35,4.45,4.55,4.65,4.75,4.85]
+    e1_values = [2.25,2.35,2.45,2.55,2.65,2.75,2.85,2.95,3.05,3.15,3.25,3.35,3.45,3.55,3.65,3.75,3.85,3.95,4.05,4.15,4.25,4.35,4.45,4.55,4.65,4.75,4.85,4.95,5.05]
+    pairwise = True
     lower_lim_values = np.linspace(5,50,45,dtype='int32')
     upper_lim_values = np.linspace(50,95,45,dtype='int32')
    
     
 
-    # initlialize helper   
     mh.initialize_flux_dicts(
-        ptype_values, cs_p_values, cs_k_values, e0_values
+        ptype_values, cs_p_values, cs_k_values, e0_values, e1_values if 'e1_values' in locals() else [None], pairwise=pairwise
     ) 
     mh.some_function_that_uses_angles()
     mh.some_function_that_uses_c_wi()
@@ -128,22 +134,50 @@ def main():
        
         x_mod = X(d) # for specific depth  
 
-        
-        for cs_p in cs_p_values:
-            for cs_k in cs_k_values:
-                for ptype in ptype_values:
+        for ptype in ptype_values:
+            for cs_p in cs_p_values:
+                for cs_k in cs_k_values:
                     for season in season_values:
-                        for e0 in e0_values:
-                            for ll in lower_lim_values:
-                                for ul in upper_lim_values:
-                                    # Call functions to compute R
-                                    
-                                    dNmu_dmu_mod = dNmu_dmu(d,season, ptype , cs_p, cs_k, e0)
-                                    R_mod = R(m,dNmu_dmu_mod, ll, ul)
-                                    R_norm = R_normalized(m,R_mod,d,ptype, e0, ll, ul)
-                                        
+                        for ll in lower_lim_values:
+                            for ul in upper_lim_values:
+                                if cs_p == 1.0 and cs_k == 1.0:
+                                    # Special case when cs_p = 1.0: use 'inf' for e1
+                                    e0 = e0_values[0] # Assign a default value for accessing the keys correctly
+                                    # Compute R with special handling for cs_p=1.0
+                                    dNmu_dmu_mod = dNmu_dmu(d, season, ptype, cs_p, cs_k, e0)
+                                    R_mod, R_mod_low, R_mod_high = R(m, dNmu_dmu_mod)
+                                    R_norm = R_normalized(m, R_mod, d, ptype)
+                                                                       
                                     # Store the result in the dictionary
-                                    results[(str(d), str(ll), str(ul), str(cs_p), str(cs_k), str(ptype), season, str(e0))] = R_norm.tolist()
+                                    results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm if normalization else (R_mod, R_mod_low, R_mod_high)
+                                else:
+                                    # For other cs_p values: handle both pairwise and non-pairwise combinations of e0 and e1
+                                    
+                                    if pairwise:
+
+                                        
+                                        #if e1_values is not None:
+                                        for e0, e1 in zip(e0_values, e1_values):
+                                            # Compute R for each pair of e0 and e1
+                                            
+                                            
+                                            dNmu_dmu_mod = dNmu_dmu(d, season, ptype, cs_p, cs_k, e0)
+                                            R_mod, R_mod_low, R_mod_high= R(m, dNmu_dmu_mod)
+                                            R_norm = R_normalized(m, R_mod, d,ptype)
+                                            
+                                            # Store the result in the dictionary
+                                            results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), str(e1))] = R_norm if normalization else (R_mod, R_mod_low, R_mod_high)
+                                    else:
+                                        # Handle case where e1_values is None
+                                        for e0 in e0_values:
+                                            for e1 in ["inf"]:  # Use "inf" when e1 is None
+                                                # Compute R for each pair of e0 and "inf" as e1
+                                                dNmu_dmu_mod = dNmu_dmu(d, season, ptype, cs_p, cs_k, e0)
+                                                R_mod, R_mod_low, R_mod_hig = R(m, dNmu_dmu_mod)
+                                                R_norm = R_normalized(m, R_mod, d, ptype, )
+                                                
+                                                # Store the result in the dictionary
+                                                results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm if normalization else (R_mod, R_mod_low, R_mod_high)
 
     with open("/hetghome/khymon/cs-files/R_value_const_pi-air_sibyll23c_smooth_R_integration_optimization_oneregion.pkl", "wb") as f:
         pickle.dump(results, f)
