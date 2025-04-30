@@ -65,8 +65,7 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, cs_pr_values ,
 
                                 #add case for cs_pr
                                 if cs_pr== 1.0:
-                                    print('going here')
-
+                                    
                                     # file without cs_pr                            
                                     flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(cs_pr, 2), round(e0, 2), round(float(e1), 2) if e1 != "inf" else "inf")] = \
                                         cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const_{'inf' if e1 is None else f'e1{e1:.2f}'}.pkl"
@@ -287,8 +286,7 @@ def _flux(angle, flux_label, ptype=2212, cs_p=1.0, cs_k=1.0, cs_pr = 1.0, e0 =10
         possible_e1_values = sorted(set(k[5] for k in intp_ground_mu_yields.keys() if k[:5] == (ptype, cs_p, cs_k, cs_pr, e0)))
         e1 = possible_e1_values[0] if possible_e1_values else None  # Pick the first valid e1
 
-        print('print e1 in flux', ptype, cs_p, cs_k, cs_pr, e0,e1)
-
+       
     key = (ptype, cs_p, cs_k, cs_pr, e0, e1)
     #print('key in helper',key)
 

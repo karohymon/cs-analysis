@@ -181,9 +181,7 @@ def main(calculation,normalization):
     #dictionary
     results = {}  # Dictionary to store the results
     d_values = [1.5, 3.5]# detectpr depth: 1.5 or 3.5km
-    print('cs_pr in main script',cs_pr_values)
-    print('cs_k in main script',cs_k_values)
-
+   
     for d in d_values:
         x_mod = X(d)  # for specific depth
         
@@ -211,12 +209,11 @@ def main(calculation,normalization):
                                 if pairwise:#if e1_values is not None:
                                     for e0, e1 in zip(e0_values, e1_values):
                                         # Compute R for each pair of e0 and e1
-                                        print('main script', e0, e1,cs_p, cs_k, cs_pr)
                                         
                                         
                                         dNmu_dmu_mod = dNmu_dmu(d, season, ptype, cs_p, cs_k, cs_pr, e0,e1)
                                         R_mod, R_mod_low, R_mod_high= R(m, dNmu_dmu_mod)
-                                        print('calculated R!')
+                                      
                                         if calc_tag == 'threshold':
                                             R_norm = R_normalized_threshold(m, R_mod, d, ptype, e0)
                                             print('e0 changed in normalization of R')
