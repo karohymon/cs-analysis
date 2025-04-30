@@ -19,7 +19,7 @@ def X(d):
      
     return d/np.cos(np.deg2rad(angles))
 
-def dNmu_dmu(d,month, ptype, cs_p, cs_k, cs_pr, e0,e1=None): # month = str
+def dNmu_dmu(d,month, ptype, cs_p, cs_k, cs_pr, e0, e1=None): # month = str
     '''
     calculate muon flux per multiplicity
 
@@ -54,7 +54,7 @@ def dNmu_dmu(d,month, ptype, cs_p, cs_k, cs_pr, e0,e1=None): # month = str
                                     ptype,
                                     cs_p, cs_k, cs_pr, e0,e1,
                                     norm=False
-                                ) / mh.rates(x_mod[i], angle, month, ptype, cs_p, cs_pr, cs_k, e0,e1)
+                                ) / mh.rates(x_mod[i], angle, month, ptype, cs_p, cs_k, cs_pr, e0,e1)
     return dNmudmu
 
 def R(m,dN_dNmu):
@@ -82,7 +82,7 @@ def R_normalized(m,R_mod,d,ptype):
 
     '''
     # default parameters
-    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs_p=1.0, cs_k=1.0, cs_pr=1.0, e0=3.65) #default cs
+    dNu_dmu_apr = dNmu_dmu(d,month="apr", ptype=ptype, cs_p=1.0, cs_k=1.0, cs_pr=1.0, e0=2.05) #default cs
     R_def_apr = R(m,dNu_dmu_apr)
     
     return R_mod/R_def_apr
@@ -181,16 +181,20 @@ def main(calculation,normalization):
     #dictionary
     results = {}  # Dictionary to store the results
     d_values = [1.5, 3.5]# detectpr depth: 1.5 or 3.5km
+    print('cs_pr in main script',cs_pr_values)
+    print('cs_k in main script',cs_k_values)
 
     for d in d_values:
         x_mod = X(d)  # for specific depth
         
         for cs_p in cs_p_values:
-            for cs_k in cs_k_values:
-                for cs_pr in cs_pr_values:
-                    for ptype in ptype_values:
+            for ptype in ptype_values:
+                for cs_k in cs_k_values:
+                    for cs_pr in cs_pr_values:
                         for season in season_values:
-                            if cs_p == 1.0:
+                            if cs_p == 1.0 and cs_k == 1.0 and cs_pr == 1.0:
+
+                                
                                 # Special case when cs_p = 1.0: use 'inf' for e1
                                 e0 = e0_values[0]  # Assign a default value for accessing the keys correctly
                                 # Compute R with special handling for cs_p=1.0
@@ -204,11 +208,15 @@ def main(calculation,normalization):
                                 results[(str(d), str(cs_p), str(cs_k),  str(cs_pr), str(ptype), season, str(e0), "inf")] = R_norm if normalization else (R_mod, R_mod_low, R_mod_high)
                             else:
                                 # For other cs_p values: handle both pairwise and non-pairwise combinations of e0 and e1
-                                if e1_values is not None:
+                                if pairwise:#if e1_values is not None:
                                     for e0, e1 in zip(e0_values, e1_values):
                                         # Compute R for each pair of e0 and e1
-                                        dNmu_dmu_mod = dNmu_dmu(d, season, ptype, cs_p, cs_k, cs_pr, e0)
+                                        print('main script', e0, e1,cs_p, cs_k, cs_pr)
+                                        
+                                        
+                                        dNmu_dmu_mod = dNmu_dmu(d, season, ptype, cs_p, cs_k, cs_pr, e0,e1)
                                         R_mod, R_mod_low, R_mod_high= R(m, dNmu_dmu_mod)
+                                        print('calculated R!')
                                         if calc_tag == 'threshold':
                                             R_norm = R_normalized_threshold(m, R_mod, d, ptype, e0)
                                             print('e0 changed in normalization of R')
@@ -220,6 +228,8 @@ def main(calculation,normalization):
                                     for e0 in e0_values:
                                         for e1 in ["inf"]:  # Use "inf" when e1 is None
                                             # Compute R for each pair of e0 and "inf" as e1
+
+                                            print('hello wrong loop')
                                             dNmu_dmu_mod = dNmu_dmu(d, season, ptype, cs_p, cs_k,cs_pr,  e0)
                                             R_mod, R_mod_low, R_mod_hig = R(m, dNmu_dmu_mod)
                                             if calc_tag == 'threshold':
@@ -231,11 +241,11 @@ def main(calculation,normalization):
 
 
     if normalization:
-        with open("/hetghome/khymon/cs-files/R_value_const_pi-air_k-air_sibyll23c_smooth_oneregion_" + str(calc_tag) + ".pkl", "wb") as f:
+        with open("/hetghome/khymon/cs-files/R_value_const_pi-air_k-air_pr-air_sibyll23c_smooth_oneregion_" + str(calc_tag) + ".pkl", "wb") as f:
             pickle.dump(results, f)
 
     else:    
-        with open("/hetghome/khymon/cs-files/R_value_const_pi-air_k-air_sibyll23c_smooth_oneregion_" + str(calc_tag) + "_nonorm.pkl", "wb") as f:
+        with open("/hetghome/khymon/cs-files/R_value_const_pi-air_k-air_pr-air_sibyll23c_smooth_oneregion_" + str(calc_tag) + "_nonorm.pkl", "wb") as f:
             pickle.dump(results, f)
 
 

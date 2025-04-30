@@ -26,7 +26,7 @@ cos_thetas = None
 
 # Define base directory as a function to call
 
-def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, cs_pr_values, e0_values, e1_values=None, pairwise=False):
+def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, cs_pr_values ,e0_values, e1_values=None, pairwise=False):
     global flux_files, muspec_files, intp_surface_fluxes, intp_ground_mu_yields, surface_fluxes, ground_muspec_energies, cos_thetas, angles, c_wi
 
     base_dir = pathlib.Path(__file__).parent
@@ -44,15 +44,16 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, cs_pr_values, 
             for cs_k in cs_k_values:
                 for cs_pr in cs_pr_values:
                     if cs_p == 1.0 and cs_k==1.0 and cs_pr==1.0:
-                        # Special case when cs_p is 1.0: only use one specific combination of e0 and e1 = None
+                        # Special case when all cs are the same as in Sibyll2.3c: only use one specific combination of e0 and e1 = None
                         #for e0 in range(len(e0)): #only one e0 needed technically
 
-                        e0 = 2.05#e0_values[0]  # Assign a default value for accessing the keys correctly
-                            
-                        flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), "inf")] = \
+                        e0 = e0_values[0]  # Assign a default value for accessing the keys correctly
+
+                         # add key but cs_pr is not indicated in the file names   
+                        flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(cs_pr, 2), round(e0, 2), "inf")] = \
                             cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}.pkl"#_e0{e0:.2f}_const.pkl"
                             
-                        muspec_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), "inf")] = \
+                        muspec_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(cs_pr, 2),  round(e0, 2), "inf")] = \
                             cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}.pkl"#_e0{e0:.2f}_const.pkl"
                     else:
                         # Handle case where pairwise is True
@@ -60,23 +61,28 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, cs_pr_values, 
                             for e0, e1 in zip(e0_values, e1_list):  # Pair e0 and e1 element-wise
                                 e0 = float(e0)  # Convert NumPy scalar to float
                                 e1 = float(e1)  # Convert e1 as well if needed
+                                print('helper script', e0, e1,cs_p, cs_k, cs_pr)
 
+                                #add case for cs_pr
+                                if cs_pr== 1.0:
+                                    print('going here')
 
-                                if cs_pr ==1.0:                        
-                                    flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), round(e1, 2) if e1 is not None else "inf")] = \
+                                    # file without cs_pr                            
+                                    flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(cs_pr, 2), round(e0, 2), round(float(e1), 2) if e1 != "inf" else "inf")] = \
                                         cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const_{'inf' if e1 is None else f'e1{e1:.2f}'}.pkl"
                                     
-                                    muspec_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), round(e1, 2) if e1 is not None else "inf")] = \
-                                        cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const_{'inf' if e1 is None else f'e1{e1:.2f}'}.pkl"
-                                
-                                else:
-                                    flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), round(e1, 2) if e1 is not None else "inf")] = \
-                                        cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_pr{cs_pr:.2f}_const_{'inf' if e1 is None else f'e1{e1:.2f}'}.pkl"
-                                    
-                                    muspec_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), round(e1, 2) if e1 is not None else "inf")] = \
-                                        cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_pr{cs_pr:.2f}_e0{e0:.2f}_const_{'inf' if e1 is None else f'e1{e1:.2f}'}.pkl"
-                                    
+                                    muspec_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(cs_pr, 2), round(e0, 2), round(float(e1), 2) if e1 != "inf" else "inf")] = \
+                                    cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const_{'inf' if e1 is None else f'e1{e1:.2f}'}.pkl"
 
+                                else:
+                                    flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(cs_pr, 2), round(e0, 2), round(float(e1), 2) if e1 != "inf" else "inf")] = \
+                                        cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_pr{cs_pr:.2f}_e0{e0:.2f}_const_{'inf' if e1 is None else f'e1{e1:.2f}'}.pkl"
+                                    
+                                    muspec_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(cs_pr, 2), round(e0, 2), round(float(e1), 2) if e1 != "inf" else "inf")] = \
+                                    cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_pr{cs_pr:.2f}_e0{e0:.2f}_const_{'inf' if e1 is None else f'e1{e1:.2f}'}.pkl"
+
+                                
+                        #deprecated from here
                         else:
                             # Handle case where pairwise is False
                             print("pairwise=False")
@@ -247,7 +253,7 @@ def get_bins_and_width_from_centers(vector):
 
 ## modified code ----------------------------------------------------------------- #
 
-def _flux(angle, flux_label, ptype=2212, cs_p=1.0, cs_k=1.0, cs_pr=1.0, e0 =1000.0, e1=None, iecr=None): # added new arguments: ptype and cs
+def _flux(angle, flux_label, ptype=2212, cs_p=1.0, cs_k=1.0, cs_pr = 1.0, e0 =1000.0, e1=None, iecr=None): # added new arguments: ptype and cs
     """
     Calculate the flux.
 
@@ -274,14 +280,17 @@ def _flux(angle, flux_label, ptype=2212, cs_p=1.0, cs_k=1.0, cs_pr=1.0, e0 =1000
 
 
 
-    if cs_p == 1.0:
+    if cs_p == 1.0 and cs_k==1.0 and cs_pr==1.0:
         e1 = 'inf'  # Explicitly set e1 to 'inf' when cs_p = 1.0
     else:
         # Find the correct e1 value for cs_p = 1.01
-        possible_e1_values = sorted(set(k[4] for k in intp_ground_mu_yields.keys() if k[:4] == (ptype, cs_p, cs_k, e0)))
+        possible_e1_values = sorted(set(k[5] for k in intp_ground_mu_yields.keys() if k[:5] == (ptype, cs_p, cs_k, cs_pr, e0)))
         e1 = possible_e1_values[0] if possible_e1_values else None  # Pick the first valid e1
 
+        print('print e1 in flux', ptype, cs_p, cs_k, cs_pr, e0,e1)
+
     key = (ptype, cs_p, cs_k, cs_pr, e0, e1)
+    #print('key in helper',key)
 
     if key not in intp_ground_mu_yields:
         raise KeyError(f"Invalid key: {key}, available keys: {list(intp_ground_mu_yields.keys())}")
@@ -305,7 +314,7 @@ def _flux(angle, flux_label, ptype=2212, cs_p=1.0, cs_k=1.0, cs_pr=1.0, e0 =1000
         assert iecr is not None
         return intp_ground_mu_yields[(ptype, cs_p, cs_k, cs_pr, e0, e1 if e1 is not None else "inf")]["jul"][iecr](cth)[:dim_ug]
 
-    raise ValueError(f"Unknown flux label '{flux_label}' for ptype={ptype}, cs_p='{cs_p}', cs_k='{cs_k}', cs_pr='{cs_pr}, e0='{e0}'")
+    raise ValueError(f"Unknown flux label '{flux_label}' for ptype={ptype}, cs_p='{cs_p}', cs_k='{cs_k}',  cs_pr='{cs_pr}',e0='{e0}'")
     
 
 
@@ -362,7 +371,7 @@ def flux(depth, angle, flux_label, ptype, cs_p, cs_k, cs_pr, e0, iecr,e1=None): 
             )
 
 
-def integrated_flux(X, flux_label, ptype,cs_p, cs_k, cs_pr, e0, e1=None, iecr=None):
+def integrated_flux(X, flux_label, ptype, cs_p, cs_k, cs_pr, e0, e1=None, iecr=None):
     """
     Get the integrated flux.
 
@@ -451,7 +460,7 @@ def integrated_mean_e(depth, ptype, cs_p, cs_k, cs_pr, e0, iecr,  e1=None, flcut
     Returns:
         float: Mean energy.
     """
-    fl = integrated_flux(depth, "yields", ptype, cs_p, cs_k, cs_pr, e0,e1, iecr=None)
+    fl = integrated_flux(depth, "yields", ptype, cs_p, cs_k, cs_pr,  e0,e1, iecr=None)
     fl[fl <= 0.0] *= 0
     fl = np.nan_to_num(fl)
     assert np.sum(fl) > 0.0, "Flux is zero everywhere"
