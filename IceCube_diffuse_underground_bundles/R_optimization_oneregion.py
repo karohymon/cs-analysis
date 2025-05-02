@@ -112,8 +112,8 @@ def main(normalization):
     cs_k_values = [1.00]
     ptype_values = [2212] 
     season_values = ["jan", "apr", "jul"]  #  seasons
-    e0_values = [2.05,2.15,2.25,2.35,2.45,2.55,2.65,2.75,2.85,2.95,3.05,3.15,3.25,3.35,3.45,3.55,3.65,3.75,3.85,3.95,4.05,4.15,4.25,4.35,4.45,4.55,4.65,4.75,4.85]
-    e1_values = [2.25,2.35,2.45,2.55,2.65,2.75,2.85,2.95,3.05,3.15,3.25,3.35,3.45,3.55,3.65,3.75,3.85,3.95,4.05,4.15,4.25,4.35,4.45,4.55,4.65,4.75,4.85,4.95,5.05]
+    e0_values = [2.05,3.65]
+    e1_values = [2.25,3.85]
     pairwise = True
     lower_lim_values = np.linspace(5,50,45,dtype='int32')
     upper_lim_values = np.linspace(50,95,45,dtype='int32')
@@ -129,7 +129,7 @@ def main(normalization):
 
     #dictionary
     results = {}  # Dictionary to store the results
-
+    
     for d in d_values:  
        
         x_mod = X(d) # for specific depth  
@@ -149,7 +149,7 @@ def main(normalization):
                                     R_norm = R_normalized(m, R_mod, d, ptype)
                                                                        
                                     # Store the result in the dictionary
-                                    results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm if normalization else (R_mod, R_mod_low, R_mod_high)
+                                    results[(str(ll), str(ul), str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm if normalization else (R_mod, R_mod_low, R_mod_high)
                                 else:
                                     # For other cs_p values: handle both pairwise and non-pairwise combinations of e0 and e1
                                     
@@ -166,7 +166,7 @@ def main(normalization):
                                             R_norm = R_normalized(m, R_mod, d,ptype)
                                             
                                             # Store the result in the dictionary
-                                            results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), str(e1))] = R_norm if normalization else (R_mod, R_mod_low, R_mod_high)
+                                            results[(str(ll), str(ul),str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), str(e1))] = R_norm if normalization else (R_mod, R_mod_low, R_mod_high)
                                     else:
                                         # Handle case where e1_values is None
                                         for e0 in e0_values:
@@ -177,7 +177,7 @@ def main(normalization):
                                                 R_norm = R_normalized(m, R_mod, d, ptype, )
                                                 
                                                 # Store the result in the dictionary
-                                                results[(str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm if normalization else (R_mod, R_mod_low, R_mod_high)
+                                                results[(str(ll), str(ul), str(d), str(cs_p), str(cs_k), str(ptype), season, str(e0), "inf")] = R_norm if normalization else (R_mod, R_mod_low, R_mod_high)
 
     with open("/hetghome/khymon/cs-files/R_value_const_pi-air_sibyll23c_smooth_R_integration_optimization_oneregion.pkl", "wb") as f:
         pickle.dump(results, f)
