@@ -212,7 +212,9 @@ def _flux(angle, flux_label, ptype=2212, cs_p1=1.0, cs_p2 = 1.0, cs_k1=1.0, cs_k
     Returns:
         numpy.ndarray: Flux.
     """
+    angle[-1] = 0.
     cth = np.cos(np.radians(angle))
+    print(cth)
     assert np.min(cth) >= cos_thetas[0] and np.max(cth) <= cos_thetas[-1]
 
     key = (ptype, cs_p1, cs_p2, cs_k1, cs_k2, e0)
