@@ -59,6 +59,7 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, cs_pr_values ,
                         # Handle case where pairwise is True
                         if pairwise:
                             for e0, e1 in zip(e0_values, e1_list):  # Pair e0 and e1 element-wise
+                                print(e0,e1)
                                 e0 = float(e0)  # Convert NumPy scalar to float
                                 e1 = float(e1)  # Convert e1 as well if needed
                                 print('helper script', e0, e1,cs_p, cs_k, cs_pr)
@@ -495,7 +496,7 @@ def mean_mult(depth, angle, flux_label, ptype, cs_p, cs_k, cs_pr, e0, e1=None, i
         float: Mean multiplicity.
     """
 
-    ufluxes = flux(depth, angle, flux_label, ptype, cs_p, cs_k, e0, iecr)
+    ufluxes = flux(depth, angle, flux_label, ptype, cs_p, cs_k, cs_pr, e0, iecr, e1)
 
     # Apply threshold to energy and flux
     mask = mute_energies > threshold
