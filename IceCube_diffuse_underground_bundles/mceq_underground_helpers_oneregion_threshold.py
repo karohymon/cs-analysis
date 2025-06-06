@@ -572,6 +572,41 @@ def mult_dist(depth, angle, pmodel, flux_label, ptype, cs_p, cs_k, cs_pr, e0, e1
         n_mu_spec[inm] = np.sum(pmodel.tot_nucleon_flux(ecr(n_mu))) * 1e-4 * decr(n_mu)
     return n_mu_spec / n_mu_spec[0] if norm is True else n_mu_spec
 
+def mult_dist_test(depth, angle, pmodel, flux_label, ptype, cs_p, cs_k, cs_pr, e0, e1=None,norm=True, threshold=500):
+    # Unweighted multiplicity vector for all CR energies at specific depth
+    mult_vec = np.array(
+        [mean_mult(depth, angle, flux_label, ptype, cs_p, cs_k, cs_pr, e0, e1, ei,threshold) for ei, e_cr in enumerate(cr_grid)] #needs yields
+    )
+    # Truncate to only include energies with multiplicity > 1e-2
+    cr_grid_tr = cr_grid[mult_vec > 1e-1]
+    mult_vec = mult_vec[mult_vec > 1e-1]
+
+    # Fit log-log spline to multiplicity vs CR energy
+    s_ecr = ip.UnivariateSpline(np.log(mult_vec), np.log(cr_grid_tr), s=0, k=1)
+    # Fit inverse
+    s_nmu = ip.UnivariateSpline(np.log(cr_grid_tr), np.log(mult_vec), s=0, k=1)
+    sd_ecr = s_ecr.derivative()
+
+    def ecr(nmu):
+        # Ecr(Nmu)
+        return np.exp(s_ecr(np.log(nmu)))
+
+    def nmu(ecr):
+        # Nmu(Ecr)
+        return np.exp(s_nmu(np.log(ecr)))
+
+    def decr(nmu):
+        # dNmu/dEcr
+        return np.exp(sd_ecr(np.log(nmu)))
+
+    # dN/dNmu = dN/dEcr * dEcr/dNmu
+    n_mu_spec = np.zeros_like(n_mu_vec)
+    ecr_nmu = np.zeros_like(n_mu_vec)
+    for inm, n_mu in enumerate(n_mu_vec):
+        n_mu_spec[inm] = np.sum(pmodel.tot_nucleon_flux(ecr(n_mu))) * 1e-4 * decr(n_mu)
+        ecr_nmu[inm] = ecr(n_mu)
+    return n_mu_spec / n_mu_spec[0] if norm is True else n_mu_spec, ecr_nmu
+
 
 def bundle_energy_dist(depth, angle, pmodel, ptype, cs_p, cs_k, cs_pr, e0, e1=None, norm=True):
     # Unweighted multiplicity vector for all CR energies at specific depth
