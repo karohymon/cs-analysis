@@ -82,26 +82,38 @@ def initialize_flux_dicts(ptype_values, cs_p_values, cs_k_values, cs_pr_values ,
                                     cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_pr{cs_pr:.2f}_e0{e0:.2f}_const_{'inf' if e1 is None else f'e1{e1:.2f}'}.pkl"
 
                                 
-                        #deprecated from here
+                        
                         else:
-                            # Handle case where pairwise is False
+                            # Handle pairwise=False
                             print("pairwise=False")
-                            for e0 in e0_values:
-                                if e1_list:  # If e1_list is not empty
-                                    for e1 in e1_list:
-                                        flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), round(e1, 2) if e1 is not None else "inf")] = \
-                                            cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const{'' if e1 is None else f'_e1{e1:.2f}'}.pkl"
-                                        
-                                        muspec_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), round(e1, 2) if e1 is not None else "inf")] = \
-                                            cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const{'' if e1 is None else f'_e1{e1:.2f}'}.pkl"
-                                else:  # If e1_list is empty or None, just iterate over e0
-                                    flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), "inf")] = \
-                                        cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const.pkl"
-                                    
-                                    muspec_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(e0, 2), "inf")] = \
-                                        cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_e0{e0:.2f}_const.pkl"
 
-     
+                            if cs_p == 1.0 and cs_k == 1.0 and cs_pr == 1.0:
+                                # Special case: load only one file without looping over e0
+                                e0 = e0_values[0]  # dummy key value for consistency
+                                flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(cs_pr, 2), round(e0, 2), "inf")] = \
+                                    cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}.pkl"
+
+                                muspec_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(cs_pr, 2), round(e0, 2), "inf")] = \
+                                    cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}.pkl"
+
+                            else:
+                                for e0 in e0_values:
+                                    if e1_list:  # e1 variation case
+                                        for e1 in e1_list:
+                                            e1_str = "inf" if e1 is None else round(e1, 2)
+                                            e1_suffix = "" if e1 is None else f"_e1{e1:.2f}"
+                                            flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(cs_pr, 2), round(e0, 2), e1_str)] = \
+                                                cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_pr{cs_pr:.2f}_e0{e0:.2f}_const{e1_suffix}.pkl"
+
+                                            muspec_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(cs_pr, 2), round(e0, 2), e1_str)] = \
+                                                cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_pr{cs_pr:.2f}_e0{e0:.2f}_const{e1_suffix}.pkl"
+
+                                    else:  # e1_list empty or None
+                                        flux_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(cs_pr, 2), round(e0, 2), "inf")] = \
+                                            cs_dir / f"surface_fluxes_season{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_pr{cs_pr:.2f}_e0{e0:.2f}_const.pkl"
+
+                                        muspec_files[(ptype, round(cs_p, 2), round(cs_k, 2), round(cs_pr, 2), round(e0, 2), "inf")] = \
+                                            cs_dir / f"ground_muspec_prim_energies_season_cstune{ptype}_pi{cs_p:.2f}_k{cs_k:.2f}_pr{cs_pr:.2f}_e0{e0:.2f}_const.pkl"
     # Load the data dynamically for surface fluxes and ground mu energies
     surface_fluxes = {}
     ground_muspec_energies = {}
