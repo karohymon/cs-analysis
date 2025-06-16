@@ -139,7 +139,7 @@ def main(scale_factor_a, scale_factor_b, scale_factor_c,interactionmodel,ptype):
     )
     pickle.dump(
         [mceq_air.e_grid, cos_thetas, surface_flux_GSF[0], surface_flux_GSF[1], surface_flux_GSF[2]],
-        open(f"/hetghome/khymon/cs-files/smooth-transition/surface_fluxes_season{nucleus}_pid{ptype}"
+        open(f"/hetghome/khymon/cs-files/spline_mod_fluxes/surface_fluxes_season{nucleus}_pid{ptype}"
             f"_a{float(scale_factor_a):.2f}"
             f"_b{float(scale_factor_b):.2f}"
             f"_c{float(scale_factor_c):.2f}.pkl", "wb"),

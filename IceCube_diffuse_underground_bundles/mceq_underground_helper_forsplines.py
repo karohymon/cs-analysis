@@ -213,12 +213,18 @@ def _flux(angle, flux_label, p1=1.0, p2=1.0, p3= 1.0, iecr=None): # added new ar
 
     cth = np.cos(np.radians(angle))
 
+    print('cos_thetas:', cth)
+    print('min cos(theta):', np.min(cth))
+    print('max cos(theta):', np.max(cth))
+
     # Directly set the maximum value to 1.0 for cos(theta)
     cos_thetas_max_adjusted = 1.0  # Explicitly set the upper bound to 1.0
 
     # Check that the min and max of cth are within the bounds of cos_thetas
-    assert np.min(cth) >= cos_thetas[0] and np.max(cth) <= cos_thetas_max_adjusted
-       
+    
+    if not (np.min(cos_thetas) <= cth <= np.max(cos_thetas)):
+        raise ValueError(f"Angle {angle} out of bounds for cos_thetas: {cos_thetas}")
+
     key = (p1, p2, p3)
     #print('key in helper',key)
 
