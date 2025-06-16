@@ -66,6 +66,7 @@ def main(scale_factor_a, scale_factor_b, scale_factor_c,interactionmodel,ptype):
     #cos_thetas = np.linspace(0.5, 1.0, num=6)
     #thetas = np.degrees(np.arccos(cos_thetas))
     thetas = np.array([0., 30., 60.])
+    cos_thetas = np.cos(np.radians(thetas))
     
 
     # modify cross section
@@ -129,18 +130,18 @@ def main(scale_factor_a, scale_factor_b, scale_factor_c,interactionmodel,ptype):
     # adapt file names
     
     pickle.dump(
-        [mceq_air.e_grid, thetas, cr_grid, ground_muspec_prim_energies[0], ground_muspec_prim_energies[1], ground_muspec_prim_energies[2]],
+        [mceq_air.e_grid, cos_thetas, cr_grid, ground_muspec_prim_energies[0], ground_muspec_prim_energies[1], ground_muspec_prim_energies[2]],
         open(f"/hetghome/khymon/cs-files/spline_mod_fluxes/ground_muspec_prim_energies_season_cstune{nucleus}_pid{ptype}"
             f"_a{float(scale_factor_a):.2f}"
-            f"b{float(scale_factor_b):.2f}"
+            f"_b{float(scale_factor_b):.2f}"
             f"_c{float(scale_factor_c):.2f}.pkl", "wb"),
             
     )
     pickle.dump(
-        [mceq_air.e_grid, thetas, surface_flux_GSF[0], surface_flux_GSF[1], surface_flux_GSF[2]],
+        [mceq_air.e_grid, cos_thetas, surface_flux_GSF[0], surface_flux_GSF[1], surface_flux_GSF[2]],
         open(f"/hetghome/khymon/cs-files/smooth-transition/surface_fluxes_season{nucleus}_pid{ptype}"
             f"_a{float(scale_factor_a):.2f}"
-            f"b{float(scale_factor_b):.2f}"
+            f"_b{float(scale_factor_b):.2f}"
             f"_c{float(scale_factor_c):.2f}.pkl", "wb"),
 
     )
