@@ -143,7 +143,7 @@ slant_depths = _SLANT_DEPTHS
 
 # Multiplicity vector
 #n_mu_vec = np.logspace(0, 2, 100)
-n_mu_vec = np.linspace(1, 100, 101)
+n_mu_vec = np.linspace(1, 100, 101) 
 e_mu_bu_vec = np.logspace(1, 10, 101)
 
 tensor_fname = (
