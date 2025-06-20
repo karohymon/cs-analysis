@@ -141,9 +141,9 @@ slant_depths = _SLANT_DEPTHS
 #c_wi = np.diff(cos_thetas)
 
 
-# Multiplicity vector
+# Multiplicity vector - now passed as an argument to mult_dist
 #n_mu_vec = np.logspace(0, 2, 100)
-n_mu_vec = np.linspace(1, 100, 101) 
+#n_mu_vec = np.linspace(1, 100, 101) 
 e_mu_bu_vec = np.logspace(1, 10, 101)
 
 tensor_fname = (
@@ -474,7 +474,7 @@ def integrated_mean_mult(depth, flux_label, p1, p2, p3, iecr=None):
     )
 
 
-def mult_dist(depth, angle, pmodel, flux_label, p1, p2, p3, norm=True, threshold=500):
+def mult_dist(depth, angle, pmodel, flux_label, p1, p2, p3, n_mu_vec, norm=True, threshold=500):
     # Unweighted multiplicity vector for all CR energies at specific depth
     mult_vec = np.array(
         [mean_mult(depth, angle, flux_label, p1, p2, p3, ei,threshold) for ei, e_cr in enumerate(cr_grid)] #needs yields
@@ -507,7 +507,7 @@ def mult_dist(depth, angle, pmodel, flux_label, p1, p2, p3, norm=True, threshold
         n_mu_spec[inm] = np.sum(pmodel.tot_nucleon_flux(ecr(n_mu))) * 1e-4 * decr(n_mu)
     return n_mu_spec / n_mu_spec[0] if norm is True else n_mu_spec
 
-def mult_dist_test(depth, angle, pmodel, flux_label, p1, p2, p3, norm=True, threshold=500):
+def mult_dist_test(depth, angle, pmodel, flux_label, p1, p2, p3, n_mu_vec,norm=True, threshold=500):
     # Unweighted multiplicity vector for all CR energies at specific depth
     mult_vec = np.array(
         [mean_mult(depth, angle, flux_label, p1, p2, p3, ei,threshold) for ei, e_cr in enumerate(cr_grid)] #needs yields
@@ -540,7 +540,7 @@ def mult_dist_test(depth, angle, pmodel, flux_label, p1, p2, p3, norm=True, thre
     for inm, n_mu in enumerate(n_mu_vec):
         n_mu_spec[inm] = np.sum(pmodel.tot_nucleon_flux(ecr(n_mu))) * 1e-4 * decr(n_mu)
         ecr_nmu[inm] = ecr(n_mu)
-    return n_mu_spec / n_mu_spec[0] if norm is True else n_mu_spec, ecr_nmu
+    return n_mu_spec / n_mu_spec[0] if norm is True else n_mu_spec
 
 
 def bundle_energy_dist(depth, angle, pmodel, p1, p2, p3, norm=True):
