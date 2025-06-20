@@ -32,8 +32,8 @@ def main():
     mceq.set_interaction_model("SIBYLL23C", force=True)
     mceq.set_theta_deg(0)
 
-    cos_thetas = np.arange(0.5, 1.001, 0.1)
-    thetas = np.degrees(np.arccos(cos_thetas))
+    thetas = np.array([0., 30., 60.])
+    cos_thetas = np.cos(np.radians(thetas))
 
     # calcualte tuned flux for different seasons
     
@@ -81,7 +81,7 @@ def main():
 
     pickle.dump(
         [mceq.e_grid, cos_thetas, flux_tot, flux_conv , flux_pr, flux_k, flux_pi ],
-        open("/hetghome/khymon/cs-files/surface_fluxes_parent_apr_GSF_Sibyll23c.pkl", "wb"),
+        open("/hetghome/khymon/cs-files/spline_mod_fluxes/surface_fluxes_parent_apr_GSF_Sibyll23c.pkl", "wb"),
     )
 
     
